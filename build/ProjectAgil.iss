@@ -72,7 +72,7 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: deskto
 [Run]
 Filename: "{tmp}\windowsdesktop-runtime.exe"; Parameters: "/install /quiet /norestart"; StatusMsg: "Installing the .NET 8 Desktop Runtime..."; Check: RuntimeMissing; Flags: waituntilterminated
 Filename: "schtasks.exe"; Parameters: "/Create /TN ""Project-Agil Autostart"" /TR ""\""{app}\{#AppExeName}\"""" /SC ONLOGON /RL HIGHEST /F"; Tasks: startup; Flags: runhidden waituntilterminated
-Filename: "{app}\{#AppExeName}"; Description: "Launch {#AppName}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#AppExeName}"; Description: "Launch {#AppName}"; Flags: nowait postinstall skipifsilent shellexec
 
 [UninstallRun]
 Filename: "schtasks.exe"; Parameters: "/Delete /TN ""Project-Agil Autostart"" /F"; Flags: runhidden waituntilterminated; RunOnceId: "RemoveAutostart"
