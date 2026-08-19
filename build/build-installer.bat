@@ -5,7 +5,9 @@ rem Builds the installer version of Project-Agil.
 rem This is the framework-dependent build, so the installer stays small and
 rem fetches the .NET 8 Desktop Runtime from Microsoft when the machine needs it.
 rem Requires Inno Setup 6 (https://jrsoftware.org/isdl.php).
-rem The build number comes from build\version.txt. Bump it by hand before a build.
+rem The build number comes from build\version.txt, which build-all.bat writes.
+rem Running this script on its own reuses that number rather than counting up,
+rem because a build is the installer and the portable exe together.
 
 set ROOT=%~dp0..
 set PROJECT=%ROOT%\src\ProjectAgil\ProjectAgil.csproj

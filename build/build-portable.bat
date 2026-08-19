@@ -4,7 +4,9 @@ setlocal
 rem Builds the portable single-file build of Project-Agil.
 rem Everything is embedded: the .NET runtime, WPF and every dependency.
 rem The result is one large exe that runs on a machine with nothing installed.
-rem The build number comes from build\version.txt. Bump it by hand before a build.
+rem The build number comes from build\version.txt, which build-all.bat writes.
+rem Running this script on its own reuses that number rather than counting up,
+rem because a build is the installer and the portable exe together.
 
 set ROOT=%~dp0..
 set PROJECT=%ROOT%\src\ProjectAgil\ProjectAgil.csproj

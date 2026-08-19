@@ -4,34 +4,40 @@ setlocal
 rem Builds both distribution artifacts: the installer and the portable exe.
 rem One build number covers both, a release always ships the pair.
 rem
-rem   build-all.bat        uses the number in build\version.txt
-rem   build-all.bat 121    writes 121 into build\version.txt first
+rem Just run this. Nothing to type, nothing to edit. The build number counts
+rem itself up every run and build\version.txt records the number that was
+rem used, so the file reads as a log of what has been built rather than
+rem something anyone has to maintain.
 rem
-rem A leading b is accepted and dropped, so b121 and 121 mean the same thing.
+rem If the count ever needs correcting, either edit build\version.txt to the
+rem last build that happened, or run build-all.bat 121 to jump straight to
+rem that number. Neither is needed in normal use.
 
 set ROOT=%~dp0..
 set GIVEN=%~1
 
-if not "%GIVEN%"=="" (
-  set GIVEN=%GIVEN:b=%
+set LAST=0
+if exist "%ROOT%\build\version.txt" (
+  for /f "usebackq tokens=* delims= " %%v in ("%ROOT%\build\version.txt") do set LAST=%%v
 )
 
-if not "%GIVEN%"=="" (
+echo %LAST%| findstr /r "^[0-9][0-9]*$" >nul
+if errorlevel 1 set LAST=0
+
+if not "%GIVEN%"=="" set GIVEN=%GIVEN:b=%
+
+if "%GIVEN%"=="" (
+  set /a BUILD=LAST+1
+) else (
   echo %GIVEN%| findstr /r "^[0-9][0-9]*$" >nul
   if errorlevel 1 (
     echo The build number must be digits only, for example 121 or b121.
     exit /b 1
   )
-  >"%ROOT%\build\version.txt" echo %GIVEN%
+  set BUILD=%GIVEN%
 )
 
-set BUILD=
-for /f "usebackq tokens=* delims= " %%v in ("%ROOT%\build\version.txt") do set BUILD=%%v
-
-if "%BUILD%"=="" (
-  echo build\version.txt is missing or empty.
-  exit /b 1
-)
+>"%ROOT%\build\version.txt" echo %BUILD%
 
 echo.
 echo ############################
