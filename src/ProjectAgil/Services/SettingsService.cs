@@ -7,7 +7,11 @@ public interface ISettingsService
 {
     AppSettings Current { get; }
 
+    event EventHandler? AdvancedModeChanged;
+
     void Save();
+
+    void SetAdvancedMode(bool value);
 }
 
 public sealed class SettingsService : ISettingsService
@@ -29,6 +33,21 @@ public sealed class SettingsService : ISettingsService
     }
 
     public AppSettings Current { get; }
+
+    public event EventHandler? AdvancedModeChanged;
+
+    public void SetAdvancedMode(bool value)
+    {
+        if (Current.AdvancedMode == value)
+        {
+            return;
+        }
+
+        Current.AdvancedMode = value;
+        Save();
+
+        AdvancedModeChanged?.Invoke(this, EventArgs.Empty);
+    }
 
     private void Migrate()
     {

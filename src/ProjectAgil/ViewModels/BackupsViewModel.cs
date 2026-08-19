@@ -71,19 +71,13 @@ public partial class BackupsViewModel(
         try
         {
             var progress = new Progress<EngineProgress>(p => ProgressText = $"{p.Current} of {p.Total}   {p.Message}");
-            var restored = await engine.RestoreAsync(snapshot, progress).ConfigureAwait(false);
+            var result = await engine.RestoreAsync(snapshot, progress).ConfigureAwait(false);
 
             OnUi(() =>
             {
                 Refresh();
                 ProgressText = string.Empty;
-                snackbar.Show(
-                    "Restored",
-                    $"{restored} settings were put back.",
-                    ControlAppearance.Success,
-                    null,
-                    TimeSpan.FromSeconds(5)
-                );
+                ShowRestoreResult(result, "Restored");
             });
         }
         finally
@@ -113,19 +107,13 @@ public partial class BackupsViewModel(
         try
         {
             var progress = new Progress<EngineProgress>(p => ProgressText = $"{p.Current} of {p.Total}   {p.Message}");
-            var restored = await engine.RestoreAllAsync(progress).ConfigureAwait(false);
+            var result = await engine.RestoreAllAsync(progress).ConfigureAwait(false);
 
             OnUi(() =>
             {
                 Refresh();
                 ProgressText = string.Empty;
-                snackbar.Show(
-                    "Everything reverted",
-                    $"{restored} settings were put back.",
-                    ControlAppearance.Success,
-                    null,
-                    TimeSpan.FromSeconds(6)
-                );
+                ShowRestoreResult(result, "Everything reverted");
             });
         }
         finally
@@ -133,6 +121,30 @@ public partial class BackupsViewModel(
             IsBusy = false;
             BusyMessage = string.Empty;
         }
+    }
+
+    private void ShowRestoreResult(RestoreResult result, string successTitle)
+    {
+        if (result.Failed == 0)
+        {
+            snackbar.Show(
+                successTitle,
+                $"{result.Restored} settings were put back.",
+                ControlAppearance.Success,
+                null,
+                TimeSpan.FromSeconds(5)
+            );
+            return;
+        }
+
+        snackbar.Show(
+            result.Restored == 0 ? "Nothing could be put back" : "Partly put back",
+            $"{result.Restored} settings were put back, {result.Failed} could not be. "
+                + "The ones that failed are still marked active so you can try again.",
+            result.Restored == 0 ? ControlAppearance.Danger : ControlAppearance.Caution,
+            null,
+            TimeSpan.FromSeconds(8)
+        );
     }
 
     [RelayCommand]

@@ -130,6 +130,7 @@
         <Grid>
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
           </Grid.RowDefinitions>
 
@@ -138,14 +139,42 @@
             Style="{StaticResource SectionHeader}"
             Text="What this point would put back" />
 
-          <TextBlock
+          <Border
             Grid.Row="1"
+            Margin="0,0,0,12"
+            Padding="14,12"
+            Background="{DynamicResource ControlFillColorDefaultBrush}"
+            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="6"
+            DataContext="{Binding ViewModel.Selected.Benchmark, Mode=OneWay}"
+            Visibility="{Binding DataContext.ViewModel.Selected.Benchmark, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource NullToVisibility}, Mode=OneWay}">
+            <StackPanel>
+              <TextBlock
+                FontWeight="SemiBold"
+                Foreground="{Binding Verdict, Converter={StaticResource VerdictToBrush}, Mode=OneWay}"
+                Text="{Binding VerdictLabel, Mode=OneWay}" />
+              <TextBlock
+                Margin="0,4,0,0"
+                Style="{StaticResource MonoText}"
+                Text="{Binding SummaryLine, Mode=OneWay}"
+                TextWrapping="Wrap" />
+              <TextBlock
+                Margin="0,4,0,0"
+                Style="{StaticResource StatCaption}"
+                Text="{Binding VerdictDetail, Mode=OneWay}"
+                TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+
+          <TextBlock
+            Grid.Row="2"
             VerticalAlignment="Top"
             Style="{StaticResource StatCaption}"
             Text="Pick an undo point on the left."
             Visibility="{Binding ViewModel.Entries.Count, Converter={StaticResource CountToVisibility}, ConverterParameter=invert, Mode=OneWay}" />
 
-          <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+          <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
             <ItemsControl Margin="0,0,10,0" ItemsSource="{Binding ViewModel.Entries, Mode=OneWay}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
@@ -157,7 +186,14 @@
                     BorderThickness="1"
                     CornerRadius="6">
                     <StackPanel>
-                      <TextBlock FontWeight="Medium" Text="{Binding TweakName, Mode=OneWay}" />
+                      <Grid>
+                        <TextBlock FontWeight="Medium" Text="{Binding TweakName, Mode=OneWay}" />
+                        <TextBlock
+                          HorizontalAlignment="Right"
+                          FontSize="11"
+                          Style="{StaticResource StatCaption}"
+                          Text="{Binding StatusDisplay, Mode=OneWay}" />
+                      </Grid>
                       <TextBlock
                         Margin="0,4,0,0"
                         Style="{StaticResource MonoText}"
@@ -173,6 +209,13 @@
                           Foreground="{DynamicResource AgilAccentBrush}"
                           Text="{Binding AppliedValue, Mode=OneWay}" />
                       </TextBlock>
+                      <TextBlock
+                        Margin="0,6,0,0"
+                        Foreground="{DynamicResource AgilLossBrush}"
+                        FontSize="12"
+                        Text="{Binding RestoreError, Mode=OneWay}"
+                        TextWrapping="Wrap"
+                        Visibility="{Binding RestoreError, Converter={StaticResource EmptyToVisibility}, Mode=OneWay}" />
                     </StackPanel>
                   </Border>
                 </DataTemplate>

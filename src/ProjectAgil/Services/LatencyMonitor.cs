@@ -11,6 +11,17 @@ public interface ILatencyMonitor
 
     bool IsPaused { get; }
 
+    bool IsCapturing { get; }
+
+    Task<BenchmarkRun> CaptureAsync(
+        PingTarget target,
+        int sampleCount,
+        int intervalMs,
+        int timeoutMs,
+        IProgress<int>? progress = null,
+        CancellationToken ct = default
+    );
+
     void Start(IEnumerable<PingTarget> targets, int intervalMs, int timeoutMs, int historySize);
 
     void Stop();
@@ -40,6 +51,7 @@ public sealed class LatencyMonitor : ILatencyMonitor, IDisposable
     private readonly Dictionary<string, Buffer> _buffers = new(StringComparer.OrdinalIgnoreCase);
 
     private volatile bool _paused;
+    private volatile bool _capturing;
     private CancellationTokenSource? _cts;
     private Task? _loop;
     private int _historySize = 240;
@@ -49,6 +61,71 @@ public sealed class LatencyMonitor : ILatencyMonitor, IDisposable
     public bool IsRunning => _cts is { IsCancellationRequested: false };
 
     public bool IsPaused => _paused;
+
+    public bool IsCapturing => _capturing;
+
+    public static int EstimateCaptureSeconds(PingTarget target, int sampleCount, int intervalMs) =>
+        (int)Math.Ceiling(sampleCount * Spacing(target, intervalMs, 0) / 1000d);
+
+    public async Task<BenchmarkRun> CaptureAsync(
+        PingTarget target,
+        int sampleCount,
+        int intervalMs,
+        int timeoutMs,
+        IProgress<int>? progress = null,
+        CancellationToken ct = default
+    )
+    {
+        var run = new BenchmarkRun
+        {
+            Host = target.Host,
+            Name = target.Name,
+            Kind = target.Kind,
+        };
+
+        if (sampleCount <= 0 || string.IsNullOrWhiteSpace(target.Host))
+        {
+            return run;
+        }
+
+        _capturing = true;
+
+        try
+        {
+            await Task.Delay(400, ct).ConfigureAwait(false);
+
+            using var pinger = target.Kind == PingKind.Icmp ? new Ping() : null;
+            var spacing = Math.Max(200, intervalMs);
+            var strikes = 0;
+
+            for (var index = 0; index < sampleCount; index++)
+            {
+                ct.ThrowIfCancellationRequested();
+
+                var (_, value) = target.Kind == PingKind.Minecraft
+                    ? await MeasureMinecraftAsync(target, timeoutMs, ct).ConfigureAwait(false)
+                    : await MeasureAsync(pinger!, target.Host, timeoutMs, ct).ConfigureAwait(false);
+
+                run.Samples.Add(value);
+                progress?.Report(index + 1);
+
+                strikes = value <= MinecraftPing.Refused
+                    ? Math.Min(strikes + 1, MaxBackoffStrikes)
+                    : Math.Max(strikes - 1, 0);
+
+                if (index < sampleCount - 1)
+                {
+                    await Task.Delay(Spacing(target, spacing, strikes), ct).ConfigureAwait(false);
+                }
+            }
+
+            return run;
+        }
+        finally
+        {
+            _capturing = false;
+        }
+    }
 
     public void Start(IEnumerable<PingTarget> targets, int intervalMs, int timeoutMs, int historySize)
     {
@@ -163,7 +240,7 @@ public sealed class LatencyMonitor : ILatencyMonitor, IDisposable
         {
             while (!ct.IsCancellationRequested)
             {
-                if (_paused)
+                if (_paused || _capturing)
                 {
                     await Task.Delay(250, ct).ConfigureAwait(false);
                     continue;

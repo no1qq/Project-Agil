@@ -154,7 +154,7 @@ public sealed class RegistryTweak : Tweak
         var parts = entry.Target.Split('|');
         if (parts.Length < 3)
         {
-            return Task.CompletedTask;
+            throw new InvalidOperationException("the recorded registry target is malformed");
         }
 
         var user = parts[0].StartsWith("HKCU", StringComparison.OrdinalIgnoreCase);
@@ -199,6 +199,12 @@ public sealed class PowerShellTweak : Tweak
     public override async Task<BackupEntry?> ApplyAsync(TweakContext ctx, string value, CancellationToken ct)
     {
         var previous = Read(ctx);
+        if (previous is null)
+        {
+            ctx.Log?.Invoke($"{Name}: current value cannot be read on this build, skipped so it stays revertible");
+            return null;
+        }
+
         var command = string.Format(CultureInfo.InvariantCulture, ApplyCommand, value, ctx.Adapter?.Name ?? string.Empty);
         var result = await ctx.Process.RunPowerShellAsync(command, ct).ConfigureAwait(false);
 
@@ -228,7 +234,7 @@ public sealed class PowerShellTweak : Tweak
     {
         if (!entry.Existed || entry.PreviousValue is null)
         {
-            return;
+            throw new InvalidOperationException("no previous value was recorded, so it cannot be put back");
         }
 
         var command = string.Format(
@@ -238,7 +244,12 @@ public sealed class PowerShellTweak : Tweak
             entry.AdapterName ?? ctx.Adapter?.Name ?? string.Empty
         );
 
-        _ = await ctx.Process.RunPowerShellAsync(command, ct).ConfigureAwait(false);
+        var result = await ctx.Process.RunPowerShellAsync(command, ct).ConfigureAwait(false);
+
+        if (!result.Success)
+        {
+            throw new InvalidOperationException(result.ShortError);
+        }
     }
 }
 
@@ -298,12 +309,24 @@ public sealed class AdapterPropertyTweak : Tweak
     public override async Task RestoreAsync(TweakContext ctx, BackupEntry entry, CancellationToken ct)
     {
         var adapter = entry.AdapterName ?? ctx.Adapter?.Name;
-        if (adapter is null || entry.PreviousValue is null)
+        if (adapter is null)
         {
-            return;
+            throw new InvalidOperationException("the network card this was applied to is not present");
         }
 
-        _ = await ctx.Process.RunPowerShellAsync(BuildCommand(adapter, entry.PreviousValue), ct).ConfigureAwait(false);
+        if (entry.PreviousValue is null)
+        {
+            throw new InvalidOperationException("no previous value was recorded, so it cannot be put back");
+        }
+
+        var result = await ctx.Process
+            .RunPowerShellAsync(BuildCommand(adapter, entry.PreviousValue), ct)
+            .ConfigureAwait(false);
+
+        if (!result.Success)
+        {
+            throw new InvalidOperationException(result.ShortError);
+        }
     }
 
     private string BuildCommand(string adapter, string value) =>

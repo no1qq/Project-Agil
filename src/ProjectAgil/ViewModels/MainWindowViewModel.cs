@@ -1,4 +1,5 @@
 using System.Windows.Controls;
+using ProjectAgil.Services;
 using ProjectAgil.Views;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
@@ -6,9 +7,24 @@ using MenuItem = System.Windows.Controls.MenuItem;
 
 namespace ProjectAgil.ViewModels;
 
+public sealed record NavDefinition(string Label, SymbolRegular Icon, Type PageType, bool Advanced);
+
 public partial class MainWindowViewModel : ObservableObject
 {
+    private static readonly NavDefinition[] Definitions =
+    [
+        new("Dashboard", SymbolRegular.Home24, typeof(Views.Pages.DashboardPage), false),
+        new("Optimize", SymbolRegular.Flash24, typeof(Views.Pages.OptimizePage), false),
+        new("All settings", SymbolRegular.Options24, typeof(Views.Pages.TweaksPage), true),
+        new("Watch my ping", SymbolRegular.PulseSquare24, typeof(Views.Pages.MonitorPage), false),
+        new("Network cards", SymbolRegular.PlugConnected24, typeof(Views.Pages.AdaptersPage), true),
+        new("Saved setups", SymbolRegular.Bookmark24, typeof(Views.Pages.ProfilesPage), false),
+        new("Undo points", SymbolRegular.ArrowUndo24, typeof(Views.Pages.BackupsPage), false),
+        new("Fix and check", SymbolRegular.Wrench24, typeof(Views.Pages.ToolsPage), false),
+    ];
+
     private readonly INavigationService _navigation;
+    private readonly ISettingsService _settings;
 
     private MainWindow? _window;
 
@@ -24,61 +40,13 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<MenuItem> _trayMenuItems = [];
 
-    public MainWindowViewModel(INavigationService navigation)
+    public MainWindowViewModel(INavigationService navigation, ISettingsService settings)
     {
         _navigation = navigation;
+        _settings = settings;
 
-        NavigationItems =
-        [
-            new NavigationViewItem
-            {
-                Content = "Dashboard",
-                Icon = new SymbolIcon { Symbol = SymbolRegular.Home24 },
-                TargetPageType = typeof(Views.Pages.DashboardPage),
-            },
-            new NavigationViewItem
-            {
-                Content = "Optimize",
-                Icon = new SymbolIcon { Symbol = SymbolRegular.Flash24 },
-                TargetPageType = typeof(Views.Pages.OptimizePage),
-            },
-            new NavigationViewItem
-            {
-                Content = "All settings",
-                Icon = new SymbolIcon { Symbol = SymbolRegular.Options24 },
-                TargetPageType = typeof(Views.Pages.TweaksPage),
-            },
-            new NavigationViewItem
-            {
-                Content = "Watch my ping",
-                Icon = new SymbolIcon { Symbol = SymbolRegular.PulseSquare24 },
-                TargetPageType = typeof(Views.Pages.MonitorPage),
-            },
-            new NavigationViewItem
-            {
-                Content = "Network cards",
-                Icon = new SymbolIcon { Symbol = SymbolRegular.PlugConnected24 },
-                TargetPageType = typeof(Views.Pages.AdaptersPage),
-            },
-            new NavigationViewItem
-            {
-                Content = "Saved setups",
-                Icon = new SymbolIcon { Symbol = SymbolRegular.Bookmark24 },
-                TargetPageType = typeof(Views.Pages.ProfilesPage),
-            },
-            new NavigationViewItem
-            {
-                Content = "Undo points",
-                Icon = new SymbolIcon { Symbol = SymbolRegular.ArrowUndo24 },
-                TargetPageType = typeof(Views.Pages.BackupsPage),
-            },
-            new NavigationViewItem
-            {
-                Content = "Fix and check",
-                Icon = new SymbolIcon { Symbol = SymbolRegular.Wrench24 },
-                TargetPageType = typeof(Views.Pages.ToolsPage),
-            },
-        ];
+        RebuildNavigationItems();
+        _settings.AdvancedModeChanged += OnAdvancedModeChanged;
 
         NavigationFooter =
         [
@@ -98,6 +66,28 @@ public partial class MainWindowViewModel : ObservableObject
             new MenuItem { Header = "Exit", Command = ExitCommand },
         ];
     }
+
+    public static IReadOnlyList<NavDefinition> VisibleNavigation(bool advanced) =>
+        [.. Definitions.Where(d => advanced || !d.Advanced)];
+
+    private void OnAdvancedModeChanged(object? sender, EventArgs e)
+    {
+        RebuildNavigationItems();
+
+        _window?.GetNavigation().ClearJournal();
+    }
+
+    private void RebuildNavigationItems() =>
+        NavigationItems =
+        [
+            .. VisibleNavigation(_settings.Current.AdvancedMode)
+                .Select(d => new NavigationViewItem
+                {
+                    Content = d.Label,
+                    Icon = new SymbolIcon { Symbol = d.Icon },
+                    TargetPageType = d.PageType,
+                }),
+        ];
 
     public void AttachWindow(MainWindow window) => _window = window;
 

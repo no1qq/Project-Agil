@@ -198,15 +198,21 @@ public partial class DashboardViewModel(
 
         try
         {
-            var restored = await engine.RestoreAllAsync().ConfigureAwait(false);
+            var result = await engine.RestoreAllAsync().ConfigureAwait(false);
 
             OnUi(() =>
                 snackbar.Show(
-                    "Reverted",
-                    $"{restored} settings were put back to their previous values.",
-                    ControlAppearance.Success,
+                    result.Failed == 0 ? "Reverted"
+                        : result.Restored == 0 ? "Nothing could be put back"
+                        : "Partly put back",
+                    result.Failed == 0
+                        ? $"{result.Restored} settings were put back to their previous values."
+                        : $"{result.Restored} settings were put back, {result.Failed} could not be.",
+                    result.Failed == 0 ? ControlAppearance.Success
+                        : result.Restored == 0 ? ControlAppearance.Danger
+                        : ControlAppearance.Caution,
                     null,
-                    TimeSpan.FromSeconds(5)
+                    TimeSpan.FromSeconds(result.Failed == 0 ? 5 : 8)
                 )
             );
 

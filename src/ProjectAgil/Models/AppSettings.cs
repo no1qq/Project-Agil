@@ -24,9 +24,13 @@ public sealed class AppSettings
 
     public string? PreferredAdapterId { get; set; }
 
-    public bool AutoApplyOnLaunch { get; set; }
-
     public bool AutoSaveProfile { get; set; } = true;
+
+    public bool AdvancedMode { get; set; }
+
+    public bool MeasureBeforeAndAfter { get; set; }
+
+    public int BenchmarkSamples { get; set; } = 20;
 
     public int SchemaVersion { get; set; }
 

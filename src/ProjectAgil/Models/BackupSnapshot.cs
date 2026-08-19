@@ -20,7 +20,16 @@ public sealed class BackupEntry
 
     public string? AdapterName { get; set; }
 
+    public bool Restored { get; set; }
+
+    public string? RestoreError { get; set; }
+
     public string PreviousDisplay => Existed ? PreviousValue ?? string.Empty : "not set";
+
+    public string StatusDisplay =>
+        Restored ? "Put back"
+        : RestoreError is null ? "Active"
+        : "Failed";
 }
 
 public sealed class BackupSnapshot
@@ -39,11 +48,24 @@ public sealed class BackupSnapshot
 
     public List<BackupEntry> Entries { get; set; } = [];
 
+    public BenchmarkComparison? Benchmark { get; set; }
+
     public DateTime CreatedLocal => CreatedUtc.ToLocalTime();
 
     public string CreatedDisplay => CreatedLocal.ToString("dd MMM yyyy  HH:mm:ss", CultureInfo.InvariantCulture);
 
     public int EntryCount => Entries.Count;
 
-    public string StatusDisplay => Restored ? "Reverted" : "Active";
+    public int RestoredCount => Restored ? Entries.Count : Entries.Count(e => e.Restored);
+
+    public int PendingCount => Entries.Count - RestoredCount;
+
+    public bool IsFullyRestored => Restored || (Entries.Count > 0 && Entries.All(e => e.Restored));
+
+    public bool IsPartlyRestored => !IsFullyRestored && Entries.Any(e => e.Restored);
+
+    public string StatusDisplay =>
+        IsFullyRestored ? "Reverted"
+        : IsPartlyRestored ? $"Partly reverted ({RestoredCount} of {EntryCount})"
+        : "Active";
 }

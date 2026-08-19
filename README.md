@@ -4,7 +4,7 @@ A free, fully local network optimizer for Minecraft PvP.
 
 Project-Agil tunes the parts of the Windows network stack that decide how fast a hit
 packet leaves your machine and how fast the server's reply reaches your game. It is a
-free alternative to Ghast Lightning, with three differences that matter:
+free alternative to Ghast Lightning, with four differences that matter:
 
 - **No account, no licence key, no telemetry.** Nothing is sent anywhere. There is no
   server to talk to.
@@ -13,6 +13,9 @@ free alternative to Ghast Lightning, with three differences that matter:
   before anything is written.
 - **Everything is reversible.** The previous value of every setting is written to an
   undo point before it is changed. One button puts all of it back.
+- **It proves its own work.** After writing, it reads every setting back and tells you
+  which ones actually stuck. It can also ping your server before and after and show you
+  the difference, including when the difference is too small to be real.
 
 ## Quick start
 
@@ -54,23 +57,39 @@ at what value, **Receive buffer** maps directly to
 congestion algorithm, and **My connection is stable** decides whether resiliency
 settings are stripped or kept. Move anything and the plan on the right rebuilds live.
 
+## Simple by default, advanced when you want it
+
+Project-Agil starts in simple mode. You get presets, three sliders, a live ping graph and
+an undo button, which is everything most people need and nothing they have to look up.
+
+Turn on **Advanced mode** in *Settings* and the rest appears: the full 61-setting table
+with its registry paths, the network card page, the per-card options on Optimize, the ping
+timing controls, and the heavier repair tools. The toggle is remembered.
+
+Nothing is lost when it is off. It only hides screens. Your saved setups keep every choice
+you made in advanced mode, presets still configure the same things, and the plan on the
+Optimize page still lists every setting it is about to change. Turn it back on and
+everything is exactly where you left it.
+
 ## The pages
 
 - **Dashboard** - how much of your plan is already applied, which card you are playing
   on, and a live latency graph against your main server.
-- **Optimize** - the control panel. Presets, sliders, card picker, and the full plan
-  grouped by category before anything is written.
-- **All settings** - every one of the 61 tweaks on its own row, with its live current
-  value, what it would become, a search box, and per-setting apply, revert and exclude.
+- **Optimize** - the control panel. Presets, sliders, card picker, the optional before and
+  after measurement, and the full plan grouped by category before anything is written.
+- **All settings** *(advanced)* - every one of the 61 tweaks on its own row, with its
+  live current value, what it would become, a search box, and per-setting apply, revert
+  and exclude.
 - **Watch my ping** - live ping to as many servers as you like, with jitter, packet
   loss, min/max, a scrolling graph with loss marked in red, and CSV export.
-- **Network cards** - card details, MTU, DNS presets (Cloudflare, Google, Quad9,
-  AdGuard) and the raw driver property table.
+- **Network cards** *(advanced)* - card details, MTU, DNS presets (Cloudflare, Google,
+  Quad9, AdGuard) and the raw driver property table.
 - **Saved setups** - store the choices you made on Optimize under a name, switch
   between them, export and import them.
-- **Undo points** - every change ever made, what it was before, and one-click revert.
-- **Fix and check** - flush DNS, clear ARP, renew the DHCP lease, reset Winsock, reset
-  TCP/IP, trace a route, and export a full network report.
+- **Undo points** - every change ever made, what it was before, whether it has been put
+  back yet, and the before/after result of that run if you measured it.
+- **Fix and check** - flush DNS, clear ARP and renew the DHCP lease. Advanced mode adds
+  trace route, the network report, and the last resort resets for Winsock and TCP/IP.
 - **Settings** - how the app itself behaves. Nothing here touches your network.
 
 ## Ping the way the game measures it
@@ -85,6 +104,49 @@ protocol the multiplayer list uses, so the measurement includes the proxy hop an
 server tick and matches what you see in game. Those rows deliberately update every few
 seconds rather than every second, because game servers rate limit repeated connections
 and start refusing you. A refusal is shown as a refusal, never counted as packet loss.
+
+## Did it actually help?
+
+Most optimizers ask you to take their word for it. This one can measure.
+
+Turn on **Measure my ping before and after** on the *Optimize* page and the run becomes
+three steps: ping your main server for a while, apply the changes, ping it again. You get
+a table comparing typical ping, the worst 5 percent, jitter and packet loss, plus a plain
+sentence saying whether the difference is real.
+
+That last part matters more than the numbers. Ping is noisy, and a tool that reports
+"3 ms faster" off ten samples is telling you about the noise, not about your connection.
+Project-Agil compares the middle value rather than the average, so one spike cannot invent
+a result, works out how much the reading naturally wanders, and if the change is smaller
+than that it says **No measurable change** instead of claiming a win. With too few replies
+to judge, it says so rather than guessing.
+
+Two things worth knowing before you turn it on:
+
+- **It takes a while.** Minecraft servers rate limit repeated connections, so pings have to
+  be spaced about three seconds apart. The default 20 samples per side works out at
+  roughly two minutes on top of the run itself. The page tells you the estimate before you
+  start, you can change the sample count in *Settings*, and **Stop** ends it early.
+- **Settings that need a restart are not included in the "after" number**, because they
+  have not taken effect yet. When your plan contains any, the result says so.
+
+The comparison is saved with the undo point, so *Undo points* shows which run actually
+helped and which one did nothing.
+
+## When Windows says yes but means no
+
+Some settings are accepted without complaint and then silently ignored, depending on your
+Windows build and your network driver. Reporting those as applied would make the whole
+tool a liar, so after writing everything Project-Agil reads every value back and compares
+it against what it asked for. Each setting ends up as one of:
+
+| Result | Meaning |
+|---|---|
+| **Applied** | Written and confirmed by reading it back. |
+| **Needs restart** | Written. Cannot be confirmed until Windows restarts. |
+| **Did not stick** | Windows accepted the command and the value still reads back unchanged. |
+| **Failed** | The write itself failed, with the reason in the log. |
+| **Not available** | Your hardware or Windows build does not have this setting. It was not touched. |
 
 ## Requirements
 
@@ -106,6 +168,17 @@ Run from source:
 ```
 dotnet run --project src/ProjectAgil
 ```
+
+### Tests
+
+```
+build\run-tests.bat
+```
+
+Unit tests for the plan builder, the tweak catalog and the before/after statistics, plus
+lints over the source tree that catch the mistakes this codebase has actually made:
+icon names that do not exist or render as a random letter, and stray typographic
+characters in user-facing text.
 
 ### Distribution builds
 
@@ -143,7 +216,14 @@ Every write goes through the same path: read the current value, record it in an 
 point, then write. A setting that did not exist before is recorded as such, so reverting
 removes it again instead of leaving a stray key behind. If a setting does not exist on
 your hardware, for example a driver that does not expose energy efficient ethernet, it
-is skipped and reported rather than forced.
+is skipped and reported rather than forced. A setting whose current value cannot be read
+at all is left alone on purpose, because a value that cannot be recorded cannot be put
+back.
+
+Reverting is tracked per setting, not per undo point. If nine of eleven go back and two
+fail, the point stays active, says *Partly reverted*, shows you why each failure happened,
+and retrying only touches the two that are left. An undo point is never marked done
+because the app tried, only because the settings are actually back.
 
 Settings marked **Advanced** (driver buffer sizes, multimedia scheduler internals,
 memory pressure protection) stay out of the plan unless you turn on *Include driver

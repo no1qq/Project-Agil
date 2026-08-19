@@ -71,7 +71,7 @@
             </StackPanel>
           </ui:Card>
 
-          <ui:Card Margin="0,0,0,12" Padding="18" VerticalContentAlignment="Top">
+          <ui:Card Margin="0,0,0,12" Padding="18" VerticalContentAlignment="Top" Visibility="{Binding ViewModel.AdvancedMode, Converter={StaticResource BoolToVisibility}, Mode=OneWay}">
             <StackPanel>
               <Border Style="{StaticResource HelpHost}" ToolTip="Lists every machine your packets pass through on the way to the server, with the delay at each step. If the ping only jumps after the third or fourth hop, the problem is your provider and not your PC.">
                 <StackPanel Orientation="Horizontal">
@@ -100,7 +100,7 @@
             </StackPanel>
           </ui:Card>
 
-          <ui:Card Margin="0,0,0,12" Padding="18" VerticalContentAlignment="Top">
+          <ui:Card Margin="0,0,0,12" Padding="18" VerticalContentAlignment="Top" Visibility="{Binding ViewModel.AdvancedMode, Converter={StaticResource BoolToVisibility}, Mode=OneWay}">
             <StackPanel>
               <TextBlock Style="{StaticResource SectionHeader}" Text="Your files" />
               <ui:Button
@@ -119,7 +119,7 @@
             </StackPanel>
           </ui:Card>
 
-          <ui:CardExpander IsExpanded="False">
+          <ui:CardExpander IsExpanded="False" Visibility="{Binding ViewModel.AdvancedMode, Converter={StaticResource BoolToVisibility}, Mode=OneWay}">
             <ui:CardExpander.Header>
               <StackPanel>
                 <StackPanel Orientation="Horizontal">

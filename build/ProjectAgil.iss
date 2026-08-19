@@ -49,6 +49,7 @@ Name: "startup"; Description: "Start Project-Agil when Windows starts"; GroupDes
 Source: "..\dist\app\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: app
 Source: "..\src\*"; DestDir: "{app}\source\src"; Excludes: "\bin\*,\obj\*,bin,obj"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: source
 Source: "..\build\*"; DestDir: "{app}\source\build"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: source
+Source: "..\tests\*"; DestDir: "{app}\source\tests"; Excludes: "\bin\*,\obj\*,bin,obj"; Flags: ignoreversion recursesubdirs createallsubdirs; Components: source
 Source: "..\Project-Agil.sln"; DestDir: "{app}\source"; Flags: ignoreversion; Components: source
 Source: "..\README.md"; DestDir: "{app}\source"; Flags: ignoreversion; Components: source
 Source: "..\CLAUDE.md"; DestDir: "{app}\source"; Flags: ignoreversion skipifsourcedoesntexist; Components: source

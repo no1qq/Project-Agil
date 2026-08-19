@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{82C23577-99C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectAgil", "src\ProjectAgil\ProjectAgil.csproj", "{CD65822F-CD57-492E-B846-FCE1DAC64534}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{550639AF-5859-403B-B01E-CEC275C37C20}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectAgil.Tests", "tests\ProjectAgil.Tests\ProjectAgil.Tests.csproj", "{AB012D90-A3AB-45EC-AC2E-BD06CB98EFFA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,8 +24,13 @@ Global
 		{CD65822F-CD57-492E-B846-FCE1DAC64534}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD65822F-CD57-492E-B846-FCE1DAC64534}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD65822F-CD57-492E-B846-FCE1DAC64534}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB012D90-A3AB-45EC-AC2E-BD06CB98EFFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB012D90-A3AB-45EC-AC2E-BD06CB98EFFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB012D90-A3AB-45EC-AC2E-BD06CB98EFFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB012D90-A3AB-45EC-AC2E-BD06CB98EFFA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CD65822F-CD57-492E-B846-FCE1DAC64534} = {82C23577-99C8-48E0-BBF4-A53DAD671828}
+		{AB012D90-A3AB-45EC-AC2E-BD06CB98EFFA} = {550639AF-5859-403B-B01E-CEC275C37C20}
 	EndGlobalSection
 EndGlobal

@@ -50,6 +50,12 @@ public partial class SettingsViewModel(
     private int _historySize = 240;
 
     [ObservableProperty]
+    private int _benchmarkSamples = 20;
+
+    [ObservableProperty]
+    private bool _advancedMode;
+
+    [ObservableProperty]
     private string _version = string.Empty;
 
     [ObservableProperty]
@@ -73,6 +79,8 @@ public partial class SettingsViewModel(
         PingInterval = config.PingIntervalMs;
         PingTimeout = config.PingTimeoutMs;
         HistorySize = config.HistorySize;
+        BenchmarkSamples = config.BenchmarkSamples;
+        AdvancedMode = config.AdvancedMode;
         IsElevated = elevation.IsElevated;
         Version = $"Project-Agil {Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)}";
 
@@ -99,6 +107,7 @@ public partial class SettingsViewModel(
         config.PingIntervalMs = Math.Clamp(PingInterval, 100, 5000);
         config.PingTimeoutMs = Math.Clamp(PingTimeout, 200, 8000);
         config.HistorySize = Math.Clamp(HistorySize, 60, 2000);
+        config.BenchmarkSamples = Math.Clamp(BenchmarkSamples, 12, 200);
 
         settings.Save();
     }
@@ -129,6 +138,18 @@ public partial class SettingsViewModel(
     partial void OnPingTimeoutChanged(int value) => Persist();
 
     partial void OnHistorySizeChanged(int value) => Persist();
+
+    partial void OnBenchmarkSamplesChanged(int value) => Persist();
+
+    partial void OnAdvancedModeChanged(bool value)
+    {
+        if (_loading)
+        {
+            return;
+        }
+
+        settings.SetAdvancedMode(value);
+    }
 
     partial void OnStartWithWindowsChanged(bool value)
     {

@@ -21,7 +21,14 @@ public partial class ToolsViewModel(
     [ObservableProperty]
     private string _traceHost = "mc.hypixel.net";
 
-    public override Task OnNavigatedToAsync() => Task.CompletedTask;
+    [ObservableProperty]
+    private bool _advancedMode;
+
+    public override Task OnNavigatedToAsync()
+    {
+        AdvancedMode = settings.Current.AdvancedMode;
+        return Task.CompletedTask;
+    }
 
     private void Log(string line) => OnUi(() => Output.Insert(0, $"{DateTime.Now:HH:mm:ss}  {line}"));
 

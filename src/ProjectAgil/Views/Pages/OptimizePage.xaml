@@ -169,7 +169,10 @@
               </StackPanel>
             </ui:Card>
 
-            <ui:CardExpander Margin="0,0,0,12" IsExpanded="False">
+            <ui:CardExpander
+              Margin="0,0,0,12"
+              IsExpanded="False"
+              Visibility="{Binding ViewModel.AdvancedMode, Converter={StaticResource BoolToVisibility}, Mode=OneWay}">
               <ui:CardExpander.Header>
                 <StackPanel>
                   <TextBlock Style="{StaticResource SettingLabel}" Text="Advanced options" />
@@ -296,6 +299,30 @@
           Padding="18"
           VerticalContentAlignment="Top">
           <StackPanel>
+            <Border
+              Style="{StaticResource HelpHost}"
+              Margin="0,0,0,14"
+              ToolTip="Pings your main server for a while before the changes and again afterwards, then compares the two. It makes the run take noticeably longer, but it is the only way to know whether the changes did anything at all on your line.">
+              <Grid>
+                <StackPanel Margin="0,0,60,0">
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource SettingLabel}" Text="Measure my ping before and after" />
+                    <ui:SymbolIcon Style="{StaticResource HelpGlyph}" />
+                  </StackPanel>
+                  <TextBlock
+                    Margin="0,3,0,0"
+                    Style="{StaticResource StatCaption}"
+                    Text="{Binding ViewModel.BenchmarkEstimate, Mode=OneWay}"
+                    TextWrapping="Wrap" />
+                </StackPanel>
+                <ui:ToggleSwitch
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Center"
+                  IsChecked="{Binding ViewModel.MeasureBeforeAndAfter, Mode=TwoWay}"
+                  IsEnabled="{Binding ViewModel.HasBenchmarkTarget, Mode=OneWay}" />
+              </Grid>
+            </Border>
+
             <ui:Button
               Height="44"
               HorizontalAlignment="Stretch"
@@ -321,6 +348,15 @@
               Text="{Binding ViewModel.ProgressText, Mode=OneWay}"
               Visibility="{Binding ViewModel.ProgressText, Converter={StaticResource EmptyToVisibility}, Mode=OneWay}" />
 
+            <ui:Button
+              Margin="0,10,0,0"
+              HorizontalAlignment="Stretch"
+              Command="{Binding ViewModel.CancelRunCommand, Mode=OneWay}"
+              Content="Stop"
+              Icon="{ui:SymbolIcon Stop24}"
+              Visibility="{Binding ViewModel.IsRunning, Converter={StaticResource BoolToVisibility}, Mode=OneWay}"
+              ToolTip="Stops the run. Anything already written stays written and stays in the undo point." />
+
             <ui:InfoBar
               Margin="0,12,0,0"
               IsClosable="True"
@@ -334,6 +370,7 @@
 
       <Grid Grid.Column="2">
         <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
           <RowDefinition Height="Auto" />
           <RowDefinition Height="*" />
         </Grid.RowDefinitions>
@@ -368,7 +405,85 @@
           </Grid>
         </ui:Card>
 
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+        <ui:Card
+          Grid.Row="1"
+          Margin="0,0,0,12"
+          Padding="18"
+          VerticalContentAlignment="Top"
+          Visibility="{Binding ViewModel.Comparison, Converter={StaticResource NullToVisibility}, Mode=OneWay}">
+          <StackPanel DataContext="{Binding ViewModel.Comparison, Mode=OneWay}">
+            <TextBlock Style="{StaticResource SectionHeader}" Text="Before and after" />
+
+            <TextBlock
+              FontSize="18"
+              FontWeight="SemiBold"
+              Foreground="{Binding Verdict, Converter={StaticResource VerdictToBrush}, Mode=OneWay}"
+              Text="{Binding VerdictLabel, Mode=OneWay}" />
+
+            <TextBlock
+              Margin="0,4,0,0"
+              Style="{StaticResource StatCaption}"
+              Text="{Binding VerdictDetail, Mode=OneWay}"
+              TextWrapping="Wrap" />
+
+            <Grid Margin="0,16,0,0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="96" />
+                <ColumnDefinition Width="96" />
+                <ColumnDefinition Width="104" />
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+              </Grid.RowDefinitions>
+
+              <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource StatCaption}" Text="Before" />
+              <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource StatCaption}" Text="After" />
+              <TextBlock Grid.Row="0" Grid.Column="3" Style="{StaticResource StatCaption}" Text="Change" />
+
+              <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,8,0,0" Text="Typical ping" ToolTip="The middle value of every reply, which one lucky or unlucky spike cannot move." />
+              <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,8,0,0" Style="{StaticResource MonoText}" Text="{Binding Before.MedianDisplay, Mode=OneWay}" />
+              <TextBlock Grid.Row="1" Grid.Column="2" Margin="0,8,0,0" Style="{StaticResource MonoText}" Text="{Binding After.MedianDisplay, Mode=OneWay}" />
+              <TextBlock Grid.Row="1" Grid.Column="3" Margin="0,8,0,0" Style="{StaticResource MonoText}" Text="{Binding MedianDeltaDisplay, Mode=OneWay}" />
+
+              <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,8,0,0" Text="Worst 5 percent" ToolTip="The spikes. This is what you feel when a hit does not register." />
+              <TextBlock Grid.Row="2" Grid.Column="1" Margin="0,8,0,0" Style="{StaticResource MonoText}" Text="{Binding Before.P95Display, Mode=OneWay}" />
+              <TextBlock Grid.Row="2" Grid.Column="2" Margin="0,8,0,0" Style="{StaticResource MonoText}" Text="{Binding After.P95Display, Mode=OneWay}" />
+              <TextBlock Grid.Row="2" Grid.Column="3" Margin="0,8,0,0" Style="{StaticResource MonoText}" Text="{Binding P95DeltaDisplay, Mode=OneWay}" />
+
+              <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,8,0,0" Text="Jitter" ToolTip="How much the ping jumps around between one reply and the next." />
+              <TextBlock Grid.Row="3" Grid.Column="1" Margin="0,8,0,0" Style="{StaticResource MonoText}" Text="{Binding Before.JitterDisplay, Mode=OneWay}" />
+              <TextBlock Grid.Row="3" Grid.Column="2" Margin="0,8,0,0" Style="{StaticResource MonoText}" Text="{Binding After.JitterDisplay, Mode=OneWay}" />
+              <TextBlock Grid.Row="3" Grid.Column="3" Margin="0,8,0,0" Style="{StaticResource MonoText}" Text="{Binding JitterDeltaDisplay, Mode=OneWay}" />
+
+              <TextBlock Grid.Row="4" Grid.Column="0" Margin="0,8,0,0" Text="Lost packets" ToolTip="Replies that never came back. Servers turning you away are not counted here." />
+              <TextBlock Grid.Row="4" Grid.Column="1" Margin="0,8,0,0" Style="{StaticResource MonoText}" Text="{Binding Before.LossDisplay, Mode=OneWay}" />
+              <TextBlock Grid.Row="4" Grid.Column="2" Margin="0,8,0,0" Style="{StaticResource MonoText}" Text="{Binding After.LossDisplay, Mode=OneWay}" />
+              <TextBlock Grid.Row="4" Grid.Column="3" Margin="0,8,0,0" Style="{StaticResource MonoText}" Text="{Binding LossDeltaDisplay, Mode=OneWay}" />
+            </Grid>
+
+            <TextBlock Margin="0,14,0,0" Style="{StaticResource StatCaption}" TextWrapping="Wrap">
+              <Run Text="{Binding Before.CountDisplay, Mode=OneWay}" />
+              <Run Text="before, " />
+              <Run Text="{Binding After.CountDisplay, Mode=OneWay}" />
+              <Run Text="after." />
+            </TextBlock>
+
+            <ui:InfoBar
+              Margin="0,12,0,0"
+              IsClosable="False"
+              IsOpen="{Binding IncompleteBecauseRestartPending, Mode=OneWay}"
+              Message="{Binding RestartNote, Mode=OneWay}"
+              Severity="Informational"
+              Title="Not the whole picture yet" />
+          </StackPanel>
+        </ui:Card>
+
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
           <ItemsControl ItemsSource="{Binding ViewModel.PlanGroups, Mode=OneWay}" Margin="0,0,10,0">
             <ItemsControl.ItemTemplate>
               <DataTemplate>

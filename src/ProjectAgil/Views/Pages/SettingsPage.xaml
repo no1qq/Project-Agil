@@ -32,6 +32,33 @@
 
       <ui:Card Margin="0,0,0,12" Padding="18" VerticalContentAlignment="Top">
         <StackPanel>
+          <TextBlock Style="{StaticResource SectionHeader}" Text="How much you want to see" />
+          <Border
+            Style="{StaticResource HelpHost}"
+            ToolTip="Off keeps Project-Agil to the parts you need: pick a preset, apply it, undo it, watch your ping. On adds the pages and controls for people who want to see and change every individual setting. Nothing you have already set up is lost either way, it is only hidden.">
+            <Grid>
+              <StackPanel Margin="0,0,60,0">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Style="{StaticResource SettingLabel}" Text="Advanced mode" />
+                  <ui:SymbolIcon Style="{StaticResource HelpGlyph}" />
+                </StackPanel>
+                <TextBlock
+                  Margin="0,3,0,0"
+                  Style="{StaticResource StatCaption}"
+                  Text="Shows All settings, Network cards, the per-card options on Optimize and the timing controls below. Your saved setups keep every choice either way."
+                  TextWrapping="Wrap" />
+              </StackPanel>
+              <ui:ToggleSwitch
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                IsChecked="{Binding ViewModel.AdvancedMode, Mode=TwoWay}" />
+            </Grid>
+          </Border>
+        </StackPanel>
+      </ui:Card>
+
+      <ui:Card Margin="0,0,0,12" Padding="18" VerticalContentAlignment="Top">
+        <StackPanel>
           <TextBlock Style="{StaticResource SectionHeader}" Text="Look and feel" />
           <Grid>
             <StackPanel Margin="0,0,60,0">
@@ -133,7 +160,10 @@
         </StackPanel>
       </ui:Card>
 
-      <ui:CardExpander Margin="0,0,0,12" IsExpanded="False">
+      <ui:CardExpander
+        Margin="0,0,0,12"
+        IsExpanded="False"
+        Visibility="{Binding ViewModel.AdvancedMode, Converter={StaticResource BoolToVisibility}, Mode=OneWay}">
         <ui:CardExpander.Header>
           <StackPanel>
             <TextBlock Style="{StaticResource SettingLabel}" Text="Ping measurement" />
@@ -193,6 +223,23 @@
                 SmallChange="30"
                 Value="{Binding ViewModel.HistorySize, Mode=TwoWay}" />
               <TextBlock Margin="0,4,0,0" Style="{StaticResource StatCaption}" Text="readings" />
+            </StackPanel>
+          </Border>
+
+          <Border Style="{StaticResource HelpHost}" ToolTip="How many pings are taken before and again after a run when you ask the optimizer to measure the difference. More pings give a more trustworthy answer but take longer, and Minecraft servers can only be pinged every few seconds.">
+            <StackPanel>
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Style="{StaticResource StatTitle}" Text="Pings per measurement" />
+                <ui:SymbolIcon Style="{StaticResource HelpGlyph}" />
+              </StackPanel>
+              <ui:NumberBox
+                Margin="0,6,0,0"
+                ClearButtonEnabled="False"
+                Maximum="200"
+                Minimum="12"
+                SmallChange="5"
+                Value="{Binding ViewModel.BenchmarkSamples, Mode=TwoWay}" />
+              <TextBlock Margin="0,4,0,0" Style="{StaticResource StatCaption}" Text="each side" />
             </StackPanel>
           </Border>
         </UniformGrid>

@@ -207,30 +207,57 @@ public partial class TweaksViewModel(
 
             OnUi(() =>
             {
-                if (result.Applied > 0)
-                {
-                    row.Current = row.Tweak.OptimizedValue;
-                    row.Status = TweakStatus.Optimized;
-                    OptimizedCount = Rows.Count(r => r.Status == TweakStatus.Optimized);
+                row.Status = item.Status;
+                row.Current = item.CurrentValue;
+                OptimizedCount = Rows.Count(r => r.Status == TweakStatus.Optimized);
 
-                    snackbar.Show(
-                        "Applied",
-                        $"{row.Name} is now set to {row.Tweak.OptimizedValue}.",
-                        ControlAppearance.Success,
-                        null,
-                        TimeSpan.FromSeconds(4)
-                    );
-                }
-                else
+                switch (item.Status)
                 {
-                    row.Status = TweakStatus.Unsupported;
-                    snackbar.Show(
-                        "Not available",
-                        $"{row.Name} is not exposed on this system.",
-                        ControlAppearance.Caution,
-                        null,
-                        TimeSpan.FromSeconds(5)
-                    );
+                    case TweakStatus.Optimized:
+                        snackbar.Show(
+                            "Applied",
+                            $"{row.Name} is now set to {row.Tweak.OptimizedValue}.",
+                            ControlAppearance.Success,
+                            null,
+                            TimeSpan.FromSeconds(4)
+                        );
+                        break;
+                    case TweakStatus.PendingRestart:
+                        snackbar.Show(
+                            "Applied, restart needed",
+                            $"{row.Name} was written. It takes effect after a restart.",
+                            ControlAppearance.Info,
+                            null,
+                            TimeSpan.FromSeconds(5)
+                        );
+                        break;
+                    case TweakStatus.NotConfirmed:
+                        snackbar.Show(
+                            "Did not stick",
+                            $"{row.Name} was accepted but still reads back as {item.CurrentDisplay}.",
+                            ControlAppearance.Caution,
+                            null,
+                            TimeSpan.FromSeconds(6)
+                        );
+                        break;
+                    case TweakStatus.Failed:
+                        snackbar.Show(
+                            "Failed",
+                            result.Log.FirstOrDefault() ?? $"{row.Name} could not be written.",
+                            ControlAppearance.Danger,
+                            null,
+                            TimeSpan.FromSeconds(6)
+                        );
+                        break;
+                    default:
+                        snackbar.Show(
+                            "Not available",
+                            $"{row.Name} is not exposed on this system.",
+                            ControlAppearance.Caution,
+                            null,
+                            TimeSpan.FromSeconds(5)
+                        );
+                        break;
                 }
             });
         }
@@ -255,7 +282,7 @@ public partial class TweaksViewModel(
 
         var snapshot = backups
             .LoadAll()
-            .FirstOrDefault(s => !s.Restored && s.Entries.Any(e => e.TweakId == row.Id));
+            .FirstOrDefault(s => s.Entries.Any(e => e.TweakId == row.Id && !e.Restored));
 
         if (snapshot is null)
         {
@@ -269,31 +296,21 @@ public partial class TweaksViewModel(
             return;
         }
 
-        var entry = snapshot.Entries.First(e => e.TweakId == row.Id);
-        var single = new BackupSnapshot
-        {
-            Id = snapshot.Id,
-            Label = snapshot.Label,
-            ProfileName = snapshot.ProfileName,
-            AdapterName = snapshot.AdapterName,
-            Entries = [entry],
-        };
-
-        _ = await engine.RestoreAsync(single).ConfigureAwait(false);
-
-        snapshot.Entries.Remove(entry);
-        snapshot.Restored = snapshot.Entries.Count == 0;
-        backups.Save(snapshot);
+        var entry = snapshot.Entries.First(e => e.TweakId == row.Id && !e.Restored);
+        var previous = entry.PreviousDisplay;
+        var result = await engine.RestoreEntryAsync(snapshot, entry).ConfigureAwait(false);
 
         await RefreshAsync().ConfigureAwait(false);
 
         OnUi(() =>
             snackbar.Show(
-                "Reverted",
-                $"{row.Name} was put back to {entry.PreviousDisplay}.",
-                ControlAppearance.Success,
+                result.Failed == 0 ? "Reverted" : "Could not revert",
+                result.Failed == 0
+                    ? $"{row.Name} was put back to {previous}."
+                    : entry.RestoreError ?? $"{row.Name} could not be put back.",
+                result.Failed == 0 ? ControlAppearance.Success : ControlAppearance.Danger,
                 null,
-                TimeSpan.FromSeconds(4)
+                TimeSpan.FromSeconds(result.Failed == 0 ? 4 : 6)
             )
         );
     }

@@ -78,8 +78,14 @@ public sealed class LatencyStats
                 _ => "Bad",
             };
 
+    public double RefusedShare => Sent == 0 ? 0 : Refused * 100d / Sent;
+
+    public bool RefusalIsWorthMentioning => Refused > 0 && (Refusing || RefusedShare >= NoteworthyRefusedPercent);
+
     public string RefusedNote =>
-        Refused == 0
+        !RefusalIsWorthMentioning
             ? string.Empty
             : $"{Refused} of {Sent} checks were turned away by the server, so they are not counted as lost packets.";
+
+    private const double NoteworthyRefusedPercent = 5d;
 }

@@ -5,7 +5,7 @@ namespace ProjectAgil.Services;
 
 public sealed record ProcessResult(int ExitCode, string StdOut, string StdErr)
 {
-    private static readonly string[] FailureMarkers =
+    private static readonly string[] ErrorStreamMarkers =
     [
         "is not recognized",
         "not supported",
@@ -14,6 +14,15 @@ public sealed record ProcessResult(int ExitCode, string StdOut, string StdErr)
         "objectnotfound",
         "access is denied",
         "exception",
+    ];
+
+    private static readonly string[] OutputStreamMarkers =
+    [
+        "is not recognized",
+        "not supported",
+        "invalid parameter",
+        "objectnotfound",
+        "cannotfind",
     ];
 
     public bool Success
@@ -25,12 +34,14 @@ public sealed record ProcessResult(int ExitCode, string StdOut, string StdErr)
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(StdErr))
+            if (!string.IsNullOrWhiteSpace(StdErr)
+                && ErrorStreamMarkers.Any(m => StdErr.Contains(m, StringComparison.OrdinalIgnoreCase)))
             {
-                return true;
+                return false;
             }
 
-            return !FailureMarkers.Any(m => StdErr.Contains(m, StringComparison.OrdinalIgnoreCase));
+            return string.IsNullOrWhiteSpace(StdOut)
+                || !OutputStreamMarkers.Any(m => StdOut.Contains(m, StringComparison.OrdinalIgnoreCase));
         }
     }
 

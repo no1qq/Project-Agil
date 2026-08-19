@@ -23,6 +23,9 @@ public enum TweakStatus
     Optimized,
     NotOptimized,
     Unsupported,
+    Failed,
+    NotConfirmed,
+    PendingRestart,
 }
 
 public enum RegistryScope

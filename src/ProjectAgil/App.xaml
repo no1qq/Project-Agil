@@ -30,6 +30,7 @@
       <helpers:TweakStatusToBrushConverter x:Key="StatusToBrush" />
       <helpers:TweakStatusToTextConverter x:Key="StatusToText" />
       <helpers:GradeToBrushConverter x:Key="GradeToBrush" />
+      <helpers:VerdictToBrushConverter x:Key="VerdictToBrush" />
       <helpers:BoolToVisibilityConverter x:Key="BoolToVisibility" />
       <helpers:InverseBoolConverter x:Key="InverseBool" />
       <helpers:CountToVisibilityConverter x:Key="CountToVisibility" />

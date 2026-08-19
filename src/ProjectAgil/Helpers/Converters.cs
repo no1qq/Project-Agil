@@ -12,6 +12,9 @@ public sealed class TweakStatusToBrushConverter : IValueConverter
             {
                 TweakStatus.Optimized => new SolidColorBrush(Color.FromRgb(0x3F, 0xD6, 0x8C)),
                 TweakStatus.NotOptimized => new SolidColorBrush(Color.FromRgb(0xF5, 0xA5, 0x24)),
+                TweakStatus.PendingRestart => new SolidColorBrush(Color.FromRgb(0x4F, 0xA8, 0xFF)),
+                TweakStatus.NotConfirmed => new SolidColorBrush(Color.FromRgb(0xFF, 0x77, 0x3D)),
+                TweakStatus.Failed => new SolidColorBrush(Color.FromRgb(0xE7, 0x4C, 0x3C)),
                 TweakStatus.Unsupported => new SolidColorBrush(Color.FromRgb(0x8A, 0x93, 0xA6)),
                 _ => new SolidColorBrush(Color.FromRgb(0x8A, 0x93, 0xA6)),
             }
@@ -29,10 +32,30 @@ public sealed class TweakStatusToTextConverter : IValueConverter
             {
                 TweakStatus.Optimized => "Applied",
                 TweakStatus.NotOptimized => "Pending",
+                TweakStatus.PendingRestart => "Needs restart",
+                TweakStatus.NotConfirmed => "Did not stick",
+                TweakStatus.Failed => "Failed",
                 TweakStatus.Unsupported => "Not available",
                 _ => "Unknown",
             }
             : "Unknown";
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        Binding.DoNothing;
+}
+
+public sealed class VerdictToBrushConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
+        value is BenchmarkVerdict verdict
+            ? verdict switch
+            {
+                BenchmarkVerdict.Better => new SolidColorBrush(Color.FromRgb(0x3F, 0xD6, 0x8C)),
+                BenchmarkVerdict.Worse => new SolidColorBrush(Color.FromRgb(0xE7, 0x4C, 0x3C)),
+                BenchmarkVerdict.NoChange => new SolidColorBrush(Color.FromRgb(0xF5, 0xA5, 0x24)),
+                _ => new SolidColorBrush(Color.FromRgb(0x8A, 0x93, 0xA6)),
+            }
+            : Brushes.Gray;
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
         Binding.DoNothing;
