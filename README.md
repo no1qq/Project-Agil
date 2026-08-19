@@ -56,22 +56,22 @@ settings are stripped or kept. Move anything and the plan on the right rebuilds 
 
 ## The pages
 
-- **Dashboard** — how much of your plan is already applied, which card you are playing
+- **Dashboard** - how much of your plan is already applied, which card you are playing
   on, and a live latency graph against your main server.
-- **Optimize** — the control panel. Presets, sliders, card picker, and the full plan
+- **Optimize** - the control panel. Presets, sliders, card picker, and the full plan
   grouped by category before anything is written.
-- **All settings** — every one of the 61 tweaks on its own row, with its live current
+- **All settings** - every one of the 61 tweaks on its own row, with its live current
   value, what it would become, a search box, and per-setting apply, revert and exclude.
-- **Watch my ping** — live ping to as many servers as you like, with jitter, packet
+- **Watch my ping** - live ping to as many servers as you like, with jitter, packet
   loss, min/max, a scrolling graph with loss marked in red, and CSV export.
-- **Network cards** — card details, MTU, DNS presets (Cloudflare, Google, Quad9,
+- **Network cards** - card details, MTU, DNS presets (Cloudflare, Google, Quad9,
   AdGuard) and the raw driver property table.
-- **Saved setups** — store the choices you made on Optimize under a name, switch
+- **Saved setups** - store the choices you made on Optimize under a name, switch
   between them, export and import them.
-- **Undo points** — every change ever made, what it was before, and one-click revert.
-- **Fix and check** — flush DNS, clear ARP, renew the DHCP lease, reset Winsock, reset
+- **Undo points** - every change ever made, what it was before, and one-click revert.
+- **Fix and check** - flush DNS, clear ARP, renew the DHCP lease, reset Winsock, reset
   TCP/IP, trace a route, and export a full network report.
-- **Settings** — how the app itself behaves. Nothing here touches your network.
+- **Settings** - how the app itself behaves. Nothing here touches your network.
 
 ## Ping the way the game measures it
 
