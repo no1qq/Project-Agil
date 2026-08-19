@@ -15,9 +15,12 @@
     <Company>Project-Agil</Company>
     <AssemblyTitle>Project-Agil</AssemblyTitle>
     <Description>Free local network optimizer for Minecraft PvP</Description>
-    <Version>1.0.0</Version>
-    <FileVersion>1.0.0.0</FileVersion>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <BuildNumber Condition="'$(BuildNumber)' == ''">0</BuildNumber>
+    <Version>$(BuildNumber).0.0</Version>
+    <FileVersion>$(BuildNumber).0.0.0</FileVersion>
+    <AssemblyVersion>$(BuildNumber).0.0.0</AssemblyVersion>
+    <InformationalVersion>b$(BuildNumber)</InformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <Copyright>Project-Agil</Copyright>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>

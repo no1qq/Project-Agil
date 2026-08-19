@@ -1,5 +1,13 @@
+#define BuildFile FileOpen(AddBackslash(SourcePath) + "version.txt")
+#define BuildNumber Trim(FileRead(BuildFile))
+#expr FileClose(BuildFile)
+
+#if Len(BuildNumber) == 0
+  #error build\version.txt is missing or empty
+#endif
+
 #define AppName "Project-Agil"
-#define AppVersion "1.0.0"
+#define AppVersion "b" + BuildNumber
 #define AppPublisher "Project-Agil"
 #define AppExeName "Project-Agil.exe"
 #define AppUrl "https://github.com/no1qq/Project-Agil"
@@ -9,6 +17,8 @@ AppId={{7A3C51E8-9D42-4B6F-A1C3-8E5D2F0B94A7}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} {#AppVersion}
+VersionInfoVersion={#BuildNumber}.0.0.0
+VersionInfoProductTextVersion={#AppVersion}
 AppPublisher={#AppPublisher}
 AppSupportURL={#AppUrl}
 AppUpdatesURL={#AppUrl}
@@ -16,7 +26,7 @@ DefaultDirName={autopf}\{#AppName}
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
 OutputDir=..\dist
-OutputBaseFilename=Project-Agil-Setup-{#AppVersion}
+OutputBaseFilename=Project-Agil-Setup
 SetupIconFile=..\src\ProjectAgil\Assets\app-light.ico
 UninstallDisplayIcon={app}\{#AppExeName}
 Compression=lzma2/max
