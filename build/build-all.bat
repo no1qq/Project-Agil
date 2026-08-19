@@ -3,8 +3,27 @@ setlocal
 
 rem Builds both distribution artifacts: the installer and the portable exe.
 rem One build number covers both, a release always ships the pair.
+rem
+rem   build-all.bat        uses the number in build\version.txt
+rem   build-all.bat 121    writes 121 into build\version.txt first
+rem
+rem A leading b is accepted and dropped, so b121 and 121 mean the same thing.
 
 set ROOT=%~dp0..
+set GIVEN=%~1
+
+if not "%GIVEN%"=="" (
+  set GIVEN=%GIVEN:b=%
+)
+
+if not "%GIVEN%"=="" (
+  echo %GIVEN%| findstr /r "^[0-9][0-9]*$" >nul
+  if errorlevel 1 (
+    echo The build number must be digits only, for example 121 or b121.
+    exit /b 1
+  )
+  >"%ROOT%\build\version.txt" echo %GIVEN%
+)
 
 set BUILD=
 for /f "usebackq tokens=* delims= " %%v in ("%ROOT%\build\version.txt") do set BUILD=%%v

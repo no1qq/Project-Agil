@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using ProjectAgil.Helpers;
 using ProjectAgil.Services;
 using Wpf.Ui;
@@ -56,9 +55,6 @@ public partial class SettingsViewModel(
     private bool _advancedMode;
 
     [ObservableProperty]
-    private string _version = string.Empty;
-
-    [ObservableProperty]
     private string _dataFolder = AppPaths.Root;
 
     [ObservableProperty]
@@ -82,7 +78,6 @@ public partial class SettingsViewModel(
         BenchmarkSamples = config.BenchmarkSamples;
         AdvancedMode = config.AdvancedMode;
         IsElevated = elevation.IsElevated;
-        Version = $"Project-Agil {Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)}";
 
         StartWithWindows = await startup.IsEnabledAsync().ConfigureAwait(false);
 

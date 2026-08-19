@@ -248,9 +248,7 @@
       <ui:Card Padding="18" VerticalContentAlignment="Top">
         <StackPanel>
           <TextBlock Style="{StaticResource SectionHeader}" Text="About Project-Agil" />
-          <TextBlock FontWeight="Medium" Text="{Binding ViewModel.Version, Mode=OneWay}" />
           <TextBlock
-            Margin="0,6,0,0"
             Style="{StaticResource StatCaption}"
             Text="Free, and everything happens on this computer. No account, no licence key, nothing is ever sent anywhere. Every change is written to an undo point first and can be put back from the Undo points page." />
           <TextBlock

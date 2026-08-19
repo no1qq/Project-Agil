@@ -16,7 +16,7 @@
 AppId={{7A3C51E8-9D42-4B6F-A1C3-8E5D2F0B94A7}
 AppName={#AppName}
 AppVersion={#AppVersion}
-AppVerName={#AppName} {#AppVersion}
+AppVerName={#AppName}
 VersionInfoVersion={#BuildNumber}.0.0.0
 VersionInfoProductTextVersion={#AppVersion}
 AppPublisher={#AppPublisher}
@@ -151,4 +151,88 @@ begin
       DownloadPage.Hide;
     end;
   end;
+end;
+
+var
+  RemoveUserData: Boolean;
+
+function UserDataFolder(): String;
+begin
+  Result := ExpandConstant('{userappdata}\Project-Agil');
+end;
+
+procedure AskAboutUserData();
+var
+  Form: TSetupForm;
+  Intro: TNewStaticText;
+  Warning: TNewStaticText;
+  Box: TNewCheckBox;
+  ContinueButton: TNewButton;
+begin
+  RemoveUserData := False;
+
+  if not DirExists(UserDataFolder()) then
+    Exit;
+
+  Form := CreateCustomForm(ScaleX(430), ScaleY(230), False, True);
+  try
+    Form.Caption := 'Uninstall Project-Agil';
+
+    Intro := TNewStaticText.Create(Form);
+    Intro.Parent := Form;
+    Intro.Left := ScaleX(14);
+    Intro.Top := ScaleY(14);
+    Intro.Width := Form.ClientWidth - ScaleX(28);
+    Intro.Height := ScaleY(46);
+    Intro.AutoSize := False;
+    Intro.WordWrap := True;
+    Intro.Caption := 'Your settings, saved setups and undo points are kept in' + #13#10 + UserDataFolder();
+
+    Warning := TNewStaticText.Create(Form);
+    Warning.Parent := Form;
+    Warning.Left := ScaleX(14);
+    Warning.Top := Intro.Top + Intro.Height + ScaleY(10);
+    Warning.Width := Form.ClientWidth - ScaleX(28);
+    Warning.Height := ScaleY(72);
+    Warning.AutoSize := False;
+    Warning.WordWrap := True;
+    Warning.Caption :=
+      'Keeping the folder means a later install picks up where you left off, and the undo points can still put your network settings back.' + #13#10 + #13#10 +
+      'Deleting it means anything already applied to Windows stays applied and can never be undone.';
+
+    Box := TNewCheckBox.Create(Form);
+    Box.Parent := Form;
+    Box.Left := ScaleX(14);
+    Box.Top := Warning.Top + Warning.Height + ScaleY(10);
+    Box.Width := Form.ClientWidth - ScaleX(28);
+    Box.Height := ScaleY(17);
+    Box.Checked := False;
+    Box.Caption := 'Delete this folder and everything in it';
+
+    ContinueButton := TNewButton.Create(Form);
+    ContinueButton.Parent := Form;
+    ContinueButton.Caption := 'Continue';
+    ContinueButton.Width := ScaleX(90);
+    ContinueButton.Height := ScaleY(23);
+    ContinueButton.Left := Form.ClientWidth - ScaleX(90 + 14);
+    ContinueButton.Top := Form.ClientHeight - ScaleY(23 + 14);
+    ContinueButton.ModalResult := mrOk;
+    ContinueButton.Default := True;
+
+    Form.ActiveControl := ContinueButton;
+
+    if Form.ShowModal() = mrOk then
+      RemoveUserData := Box.Checked;
+  finally
+    Form.Free;
+  end;
+end;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  if CurUninstallStep = usUninstall then
+    AskAboutUserData();
+
+  if (CurUninstallStep = usPostUninstall) and RemoveUserData then
+    DelTree(UserDataFolder(), True, True, True);
 end;
