@@ -63,10 +63,21 @@ public partial class App
         })
         .Build();
 
+    private static Mutex? InstanceLock;
+
+    private static bool IsFirstInstance;
+
     public static IServiceProvider Services => AppHost.Services;
 
     public static T Resolve<T>()
         where T : notnull => AppHost.Services.GetRequiredService<T>();
+
+    private static bool ClaimSingleInstance()
+    {
+        InstanceLock = new Mutex(true, "Project-Agil-single-instance", out var first);
+
+        return first;
+    }
 
     private static void SuppressFocusVisuals()
     {
@@ -83,6 +94,24 @@ public partial class App
 
     private async void OnStartup(object sender, StartupEventArgs e)
     {
+        IsFirstInstance = ClaimSingleInstance();
+
+        if (!IsFirstInstance)
+        {
+            _ = MessageBox.Show(
+                "Project-Agil is already open.\n\n"
+                    + "Pressing the X only hides the window, it keeps running. "
+                    + "Look for the Project-Agil icon next to the clock and click it to get the window back.",
+                "Project-Agil is already running",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error
+            );
+
+            Shutdown();
+
+            return;
+        }
+
         SuppressFocusVisuals();
         AppIcon.FollowTheme();
         AppPaths.EnsureCreated();
@@ -91,6 +120,13 @@ public partial class App
 
     private async void OnExit(object sender, ExitEventArgs e)
     {
+        if (!IsFirstInstance)
+        {
+            InstanceLock?.Dispose();
+
+            return;
+        }
+
         try
         {
             Resolve<ILatencyMonitor>().Stop();
@@ -103,6 +139,8 @@ public partial class App
 
         await AppHost.StopAsync();
         AppHost.Dispose();
+
+        InstanceLock?.Dispose();
     }
 
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
