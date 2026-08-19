@@ -41,7 +41,7 @@ if "%GIVEN%"=="" (
 
 echo.
 echo ############################
-echo   Project-Agil build b%BUILD%
+echo   Project-Agil build
 echo ############################
 
 call "%~dp0build-installer.bat"
@@ -51,7 +51,7 @@ call "%~dp0build-portable.bat"
 set PORTABLE=%errorlevel%
 
 echo.
-echo === Summary for b%BUILD% ===
+echo === Summary ===
 if "%INSTALLER%"=="0" (echo installer  ok   dist\Project-Agil-Setup.exe) else (echo installer  failed or skipped, code %INSTALLER%)
 if "%PORTABLE%"=="0"  (echo portable   ok   dist\Project-Agil-Portable.exe) else (echo portable   failed, code %PORTABLE%)
 echo.
@@ -59,7 +59,7 @@ echo.
 if not "%INSTALLER%"=="0" exit /b %INSTALLER%
 if not "%PORTABLE%"=="0" exit /b %PORTABLE%
 
-echo Build b%BUILD% is complete. Tag the release b%BUILD% and attach both files.
+echo Done. Both files are in dist. Tag the release b%BUILD%.
 echo.
 
 endlocal

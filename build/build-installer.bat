@@ -23,7 +23,7 @@ if "%BUILD%"=="" (
 )
 
 echo.
-echo === Project-Agil installer build b%BUILD% ===
+echo === Project-Agil installer build ===
 echo.
 
 if exist "%APPOUT%" rmdir /s /q "%APPOUT%"
