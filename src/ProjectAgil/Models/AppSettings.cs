@@ -30,6 +30,8 @@ public sealed class AppSettings
 
     public bool MeasureBeforeAndAfter { get; set; }
 
+    public bool CheckForUpdates { get; set; } = true;
+
     public int BenchmarkSamples { get; set; } = 20;
 
     public int SchemaVersion { get; set; }

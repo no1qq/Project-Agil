@@ -55,6 +55,9 @@ public partial class SettingsViewModel(
     private bool _advancedMode;
 
     [ObservableProperty]
+    private bool _checkForUpdates = true;
+
+    [ObservableProperty]
     private string _dataFolder = AppPaths.Root;
 
     [ObservableProperty]
@@ -77,6 +80,7 @@ public partial class SettingsViewModel(
         HistorySize = config.HistorySize;
         BenchmarkSamples = config.BenchmarkSamples;
         AdvancedMode = config.AdvancedMode;
+        CheckForUpdates = config.CheckForUpdates;
         IsElevated = elevation.IsElevated;
 
         StartWithWindows = await startup.IsEnabledAsync().ConfigureAwait(false);
@@ -103,6 +107,7 @@ public partial class SettingsViewModel(
         config.PingTimeoutMs = Math.Clamp(PingTimeout, 200, 8000);
         config.HistorySize = Math.Clamp(HistorySize, 60, 2000);
         config.BenchmarkSamples = Math.Clamp(BenchmarkSamples, 12, 200);
+        config.CheckForUpdates = CheckForUpdates;
 
         settings.Save();
     }
@@ -127,6 +132,8 @@ public partial class SettingsViewModel(
     partial void OnConfirmBeforeApplyChanged(bool value) => Persist();
 
     partial void OnAutoSaveProfileChanged(bool value) => Persist();
+
+    partial void OnCheckForUpdatesChanged(bool value) => Persist();
 
     partial void OnPingIntervalChanged(int value) => Persist();
 

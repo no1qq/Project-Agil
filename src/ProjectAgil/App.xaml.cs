@@ -17,6 +17,7 @@ public partial class App
             services.AddNavigationViewPageProvider();
             services.AddHostedService<ApplicationHostService>();
             services.AddHostedService<ProfileAutoSaveService>();
+            services.AddHostedService<UpdateCheckService>();
 
             services.AddSingleton<ISnackbarService, SnackbarService>();
             services.AddSingleton<IContentDialogService, ContentDialogService>();
@@ -36,6 +37,7 @@ public partial class App
             services.AddSingleton<ISettingsService, SettingsService>();
             services.AddSingleton<ITweakEngine, TweakEngine>();
             services.AddSingleton<ILatencyMonitor, LatencyMonitor>();
+            services.AddSingleton<IUpdateService, UpdateService>();
 
             services.AddSingleton<INavigationWindow, Views.MainWindow>();
             services.AddSingleton<ViewModels.MainWindowViewModel>();

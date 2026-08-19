@@ -6,8 +6,10 @@ Project-Agil tunes the parts of the Windows network stack that decide how fast a
 packet leaves your machine and how fast the server's reply reaches your game. It is a
 free alternative to Ghast Lightning, with four differences that matter:
 
-- **No account, no licence key, no telemetry.** Nothing is sent anywhere. There is no
-  server to talk to.
+- **No account, no licence key, no telemetry.** Nothing about you or your connection ever
+  leaves the machine, and there is no server behind the app. The only thing that touches
+  the internet is an update check that asks GitHub for the latest release on launch, and
+  you can switch that off in Settings.
 - **Nothing is hidden.** Every change shows you the exact registry key, PowerShell
   command or driver property it will touch, its current value and its target value,
   before anything is written.

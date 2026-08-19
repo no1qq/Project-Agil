@@ -245,12 +245,28 @@
         </UniformGrid>
       </ui:CardExpander>
 
+      <ui:Card Margin="0,0,0,12" Padding="18" VerticalContentAlignment="Top">
+        <StackPanel>
+          <TextBlock Style="{StaticResource SectionHeader}" Text="Updates" />
+          <Grid>
+            <StackPanel Margin="0,0,60,0">
+              <TextBlock Style="{StaticResource SettingLabel}" Text="Look for a newer build when I open the app" />
+              <TextBlock Style="{StaticResource StatCaption}" Text="Asks GitHub once, on launch, whether a newer build has been released, and tells you on the Dashboard if there is one. Nothing is downloaded and nothing is installed until you press the button yourself. No account and nothing about you is sent." />
+            </StackPanel>
+            <ui:ToggleSwitch
+              HorizontalAlignment="Right"
+              VerticalAlignment="Center"
+              IsChecked="{Binding ViewModel.CheckForUpdates, Mode=TwoWay}" />
+          </Grid>
+        </StackPanel>
+      </ui:Card>
+
       <ui:Card Padding="18" VerticalContentAlignment="Top">
         <StackPanel>
           <TextBlock Style="{StaticResource SectionHeader}" Text="About Project-Agil" />
           <TextBlock
             Style="{StaticResource StatCaption}"
-            Text="Free, and everything happens on this computer. No account, no licence key, nothing is ever sent anywhere. Every change is written to an undo point first and can be put back from the Undo points page." />
+            Text="Free, and everything happens on this computer. No account, no licence key, no telemetry, and nothing about you or your connection ever leaves the machine. The one thing that reaches the internet is the update check above, and you can turn that off. Every change is written to an undo point first and can be put back from the Undo points page." />
           <TextBlock
             Margin="0,10,0,0"
             Style="{StaticResource MonoText}"

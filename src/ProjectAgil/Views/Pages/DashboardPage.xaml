@@ -40,14 +40,37 @@
       <TextBlock Style="{StaticResource PageSubtitle}" Text="How your connection is doing right now, and how much of it Project-Agil has tuned." />
     </StackPanel>
 
-    <ui:InfoBar
-      Grid.Row="1"
-      Margin="0,0,0,14"
-      IsClosable="False"
-      IsOpen="{Binding ViewModel.ShowElevationWarning, Mode=OneWay}"
-      Message="Windows will not let Project-Agil change network settings unless it runs as administrator. Close it, right click the icon and pick Run as administrator."
-      Severity="Warning"
-      Title="Not running as administrator" />
+    <StackPanel Grid.Row="1">
+      <ui:InfoBar
+        Margin="0,0,0,14"
+        IsClosable="False"
+        IsOpen="{Binding ViewModel.ShowElevationWarning, Mode=OneWay}"
+        Message="Windows will not let Project-Agil change network settings unless it runs as administrator. Close it, right click the icon and pick Run as administrator."
+        Severity="Warning"
+        Title="Not running as administrator" />
+
+      <ui:InfoBar
+        Margin="0,0,0,14"
+        IsClosable="False"
+        IsOpen="{Binding ViewModel.UpdateAvailable, Mode=OneWay}"
+        Message="A newer build of Project-Agil is ready. Updating downloads it and restarts the app. Your settings, saved setups and undo points are kept."
+        Severity="Informational"
+        Title="An update is available">
+        <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+          <ui:Button
+            Appearance="Primary"
+            Command="{Binding ViewModel.InstallUpdateCommand, Mode=OneWay}"
+            Content="Update now"
+            Icon="{ui:SymbolIcon ArrowDownload24}"
+            IsEnabled="{Binding ViewModel.UpdateBusy, Converter={StaticResource InverseBool}, Mode=OneWay}" />
+          <TextBlock
+            Margin="12,0,0,0"
+            VerticalAlignment="Center"
+            Style="{StaticResource StatCaption}"
+            Text="{Binding ViewModel.UpdateState, Mode=OneWay}" />
+        </StackPanel>
+      </ui:InfoBar>
+    </StackPanel>
 
     <Grid Grid.Row="2" Margin="0,0,0,14">
       <Grid.ColumnDefinitions>

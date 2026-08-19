@@ -15,7 +15,8 @@ public partial class DashboardViewModel(
     IElevationService elevation,
     ILatencyMonitor monitor,
     INavigationService navigation,
-    ISnackbarService snackbar
+    ISnackbarService snackbar,
+    IUpdateService updates
 ) : PageViewModel
 {
     private bool _hooked;
@@ -65,6 +66,15 @@ public partial class DashboardViewModel(
     [ObservableProperty]
     private ObservableCollection<string> _activity = [];
 
+    [ObservableProperty]
+    private bool _updateAvailable;
+
+    [ObservableProperty]
+    private bool _updateBusy;
+
+    [ObservableProperty]
+    private string _updateState = string.Empty;
+
     public override async Task OnNavigatedToAsync()
     {
         IsElevated = elevation.IsElevated;
@@ -73,8 +83,11 @@ public partial class DashboardViewModel(
         if (!_hooked)
         {
             monitor.Updated += OnMonitorUpdated;
+            updates.AvailableChanged += OnUpdateAvailableChanged;
             _hooked = true;
         }
+
+        UpdateAvailable = updates.Available is not null;
 
         EnsureMonitor();
         await RefreshAsync().ConfigureAwait(false);
@@ -90,6 +103,52 @@ public partial class DashboardViewModel(
         if (!monitor.IsRunning && config.Targets.Any(t => t.Enabled))
         {
             monitor.Start(config.Targets, config.PingIntervalMs, config.PingTimeoutMs, config.HistorySize);
+        }
+    }
+
+    private void OnUpdateAvailableChanged(object? sender, EventArgs e) =>
+        OnUi(() => UpdateAvailable = updates.Available is not null);
+
+    [RelayCommand]
+    private async Task InstallUpdateAsync()
+    {
+        var info = updates.Available;
+
+        if (info is null || UpdateBusy)
+        {
+            return;
+        }
+
+        UpdateBusy = true;
+        UpdateState = "Downloading";
+
+        try
+        {
+            var progress = new Progress<double>(p => OnUi(() => UpdateState = $"Downloading {p:0}%"));
+
+            await updates.InstallAsync(info, progress).ConfigureAwait(false);
+
+            OnUi(() =>
+            {
+                UpdateState = "Restarting";
+                Application.Current.Shutdown();
+            });
+        }
+        catch (Exception ex)
+        {
+            OnUi(() =>
+            {
+                UpdateBusy = false;
+                UpdateState = string.Empty;
+
+                snackbar.Show(
+                    "Update failed",
+                    ex.Message,
+                    ControlAppearance.Danger,
+                    null,
+                    TimeSpan.FromSeconds(6)
+                );
+            });
         }
     }
 
