@@ -1,0 +1,286 @@
+<Page
+  x:Class="ProjectAgil.Views.Pages.AdaptersPage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:local="clr-namespace:ProjectAgil.Views.Pages"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+  Title="Network cards"
+  d:DataContext="{d:DesignInstance local:AdaptersPage, IsDesignTimeCreatable=False}"
+  d:DesignHeight="760"
+  d:DesignWidth="1100"
+  ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
+  ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+  FocusVisualStyle="{x:Null}"
+  ToolTipService.InitialShowDelay="260"
+  ToolTipService.ShowDuration="60000"
+  ToolTipService.BetweenShowDelay="120"
+  mc:Ignorable="d">
+
+  <Grid Margin="36,18,36,22">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <Grid Grid.Row="0" Margin="0,0,0,14">
+      <StackPanel Margin="0,0,120,0">
+        <TextBlock Style="{StaticResource PageTitle}" Text="Network cards" />
+        <TextBlock Style="{StaticResource PageSubtitle}" Text="Pick the card you play on, then change its address settings. Everything here applies to that one card only." />
+      </StackPanel>
+
+      <ui:Button
+        HorizontalAlignment="Right"
+        VerticalAlignment="Center"
+        Command="{Binding ViewModel.RefreshCommand, Mode=OneWay}"
+        Icon="{ui:SymbolIcon ArrowSync24}"
+        ToolTip="Look for network cards again." />
+    </Grid>
+
+    <Grid Grid.Row="1">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="330" />
+        <ColumnDefinition Width="16" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <ui:Card
+        Grid.Column="0"
+        Padding="14"
+        VerticalAlignment="Stretch"
+        VerticalContentAlignment="Stretch">
+        <ui:ListView
+          ItemsSource="{Binding ViewModel.Adapters, Mode=OneWay}"
+          SelectedItem="{Binding ViewModel.Selected, Mode=TwoWay}"
+          Style="{StaticResource ListPanel}"
+          ToolTip="A green dot means the card is connected right now.">
+          <ui:ListView.ItemTemplate>
+            <DataTemplate>
+              <StackPanel Margin="0,5">
+                <StackPanel Orientation="Horizontal">
+                  <Ellipse
+                    Width="7"
+                    Height="7"
+                    Margin="0,0,8,0"
+                    VerticalAlignment="Center"
+                    Fill="{DynamicResource AgilGoodBrush}"
+                    Visibility="{Binding IsUp, Converter={StaticResource BoolToVisibility}, Mode=OneWay}" />
+                  <TextBlock FontWeight="Medium" Text="{Binding Name, Mode=OneWay}" />
+                </StackPanel>
+                <TextBlock
+                  Margin="0,3,0,0"
+                  Style="{StaticResource StatCaption}"
+                  Text="{Binding Description, Mode=OneWay}"
+                  TextTrimming="CharacterEllipsis"
+                  TextWrapping="NoWrap" />
+                <TextBlock Margin="0,2,0,0" Style="{StaticResource MonoText}">
+                  <Run Text="{Binding IPv4, Mode=OneWay}" />
+                  <Run Text="   " />
+                  <Run Text="{Binding SpeedDisplay, Mode=OneWay}" />
+                </TextBlock>
+              </StackPanel>
+            </DataTemplate>
+          </ui:ListView.ItemTemplate>
+        </ui:ListView>
+      </ui:Card>
+
+      <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0,0,10,0">
+
+          <ui:Card Margin="0,0,0,12" Padding="18" VerticalContentAlignment="Top">
+            <StackPanel>
+              <Grid Margin="0,0,0,4">
+                <TextBlock Style="{StaticResource SectionHeader}" Text="Details" />
+                <ui:Button
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Top"
+                  Appearance="Caution"
+                  Command="{Binding ViewModel.RestartAdapterCommand, Mode=OneWay}"
+                  Content="Restart this card"
+                  Icon="{ui:SymbolIcon ArrowClockwise24}"
+                  ToolTip="Turns the network card off and on again. You lose connection for a few seconds." />
+              </Grid>
+
+              <UniformGrid Columns="3">
+                <StackPanel Margin="0,0,10,12">
+                  <TextBlock Style="{StaticResource StatTitle}" Text="Status" />
+                  <TextBlock Margin="0,3,0,0" Text="{Binding ViewModel.Selected.StatusDisplay, Mode=OneWay, FallbackValue=-}" />
+                </StackPanel>
+
+                <Border Style="{StaticResource HelpHost}" Margin="0,0,10,12" ToolTip="How fast the cable or Wi-Fi link itself is. This is not your internet speed.">
+                  <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                      <TextBlock Style="{StaticResource StatTitle}" Text="Link speed" />
+                      <ui:SymbolIcon Style="{StaticResource HelpGlyph}" />
+                    </StackPanel>
+                    <TextBlock Margin="0,3,0,0" Text="{Binding ViewModel.Selected.SpeedDisplay, Mode=OneWay, FallbackValue=-}" />
+                  </StackPanel>
+                </Border>
+
+                <StackPanel Margin="0,0,0,12">
+                  <TextBlock Style="{StaticResource StatTitle}" Text="Your address" />
+                  <TextBlock Margin="0,3,0,0" Text="{Binding ViewModel.Selected.IPv4, Mode=OneWay, FallbackValue=-}" />
+                </StackPanel>
+
+                <Border Style="{StaticResource HelpHost}" Margin="0,0,10,0" ToolTip="Your router. Everything leaving your house goes through this address first.">
+                  <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                      <TextBlock Style="{StaticResource StatTitle}" Text="Router" />
+                      <ui:SymbolIcon Style="{StaticResource HelpGlyph}" />
+                    </StackPanel>
+                    <TextBlock Margin="0,3,0,0" Text="{Binding ViewModel.Selected.Gateway, Mode=OneWay, FallbackValue=-}" />
+                  </StackPanel>
+                </Border>
+
+                <StackPanel Margin="0,0,10,0">
+                  <TextBlock Style="{StaticResource StatTitle}" Text="Name servers" />
+                  <TextBlock
+                    Margin="0,3,0,0"
+                    Text="{Binding ViewModel.Selected.DnsServers, Mode=OneWay, FallbackValue=-}"
+                    TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+
+                <StackPanel>
+                  <TextBlock Style="{StaticResource StatTitle}" Text="Hardware address" />
+                  <TextBlock
+                    Margin="0,3,0,0"
+                    Style="{StaticResource MonoText}"
+                    Text="{Binding ViewModel.Selected.MacAddress, Mode=OneWay, FallbackValue=-}" />
+                </StackPanel>
+              </UniformGrid>
+            </StackPanel>
+          </ui:Card>
+
+          <ui:Card Margin="0,0,0,12" Padding="18" VerticalContentAlignment="Top">
+            <StackPanel>
+              <Border Style="{StaticResource HelpHost}" ToolTip="Name servers turn an address like mc.hypixel.net into a number your computer can connect to. A faster one shaves time off joining a server, though it does not change your ping in game.">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Style="{StaticResource SectionHeader}" Text="Name servers" />
+                  <ui:SymbolIcon Style="{StaticResource HelpGlyph}" Margin="6,0,0,10" />
+                </StackPanel>
+              </Border>
+
+              <WrapPanel>
+                <ui:Button
+                  Margin="0,0,6,6"
+                  Command="{Binding ViewModel.SetDnsCommand, Mode=OneWay}"
+                  CommandParameter="cloudflare"
+                  Content="Cloudflare"
+                  ToolTip="1.1.1.1 and 1.0.0.1. Usually the fastest, and it does not log what you look up." />
+                <ui:Button
+                  Margin="0,0,6,6"
+                  Command="{Binding ViewModel.SetDnsCommand, Mode=OneWay}"
+                  CommandParameter="google"
+                  Content="Google"
+                  ToolTip="8.8.8.8 and 8.8.4.4. Reliable everywhere in the world." />
+                <ui:Button
+                  Margin="0,0,6,6"
+                  Command="{Binding ViewModel.SetDnsCommand, Mode=OneWay}"
+                  CommandParameter="quad9"
+                  Content="Quad9"
+                  ToolTip="9.9.9.9. Blocks known malware sites for you." />
+                <ui:Button
+                  Margin="0,0,6,6"
+                  Command="{Binding ViewModel.SetDnsCommand, Mode=OneWay}"
+                  CommandParameter="adguard"
+                  Content="AdGuard"
+                  ToolTip="Blocks ads and trackers before they load." />
+                <ui:Button
+                  Margin="0,0,6,6"
+                  Command="{Binding ViewModel.ResetDnsCommand, Mode=OneWay}"
+                  Content="Back to automatic"
+                  ToolTip="Use whatever your router hands out. This is how Windows ships." />
+              </WrapPanel>
+
+              <StackPanel Margin="0,8,0,0" Orientation="Horizontal">
+                <ui:TextBox
+                  Width="240"
+                  PlaceholderText="1.1.1.1, 1.0.0.1"
+                  Text="{Binding ViewModel.CustomDns, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  ToolTip="Type your own addresses, separated by a comma." />
+                <ui:Button
+                  Margin="8,0,0,0"
+                  Command="{Binding ViewModel.SetDnsCommand, Mode=OneWay}"
+                  CommandParameter="custom"
+                  Content="Use these" />
+              </StackPanel>
+            </StackPanel>
+          </ui:Card>
+
+          <ui:CardExpander Margin="0,0,0,12" IsExpanded="False">
+            <ui:CardExpander.Header>
+              <StackPanel>
+                <TextBlock Style="{StaticResource SettingLabel}" Text="Packet size and driver settings" />
+                <TextBlock
+                  Margin="0,3,0,0"
+                  Style="{StaticResource StatCaption}"
+                  Text="Only open this if you know what you are changing. The presets already handle it." />
+              </StackPanel>
+            </ui:CardExpander.Header>
+
+            <StackPanel Margin="0,4,0,0">
+              <Border Style="{StaticResource HelpHost}" ToolTip="The biggest packet your connection can carry in one piece. Too big and every packet gets chopped up and slowed down. 1500 is right for fiber and cable, 1492 for DSL, 1428 for mobile.">
+                <StackPanel>
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource StatTitle}" Text="Biggest packet size" />
+                    <ui:SymbolIcon Style="{StaticResource HelpGlyph}" />
+                  </StackPanel>
+                  <StackPanel Margin="0,6,0,0" Orientation="Horizontal">
+                    <ui:NumberBox
+                      Width="150"
+                      ClearButtonEnabled="False"
+                      Maximum="9000"
+                      Minimum="576"
+                      SmallChange="4"
+                      Value="{Binding ViewModel.Mtu, Mode=TwoWay}" />
+                    <ui:Button
+                      Margin="8,0,0,0"
+                      Command="{Binding ViewModel.ApplyMtuCommand, Mode=OneWay}"
+                      Content="Apply" />
+                  </StackPanel>
+                  <TextBlock
+                    Margin="0,8,0,0"
+                    Style="{StaticResource StatCaption}"
+                    Text="1500 for fiber and cable, 1492 for DSL, 1428 for most mobile links. Needs a restart." />
+                </StackPanel>
+              </Border>
+
+              <TextBlock
+                Margin="0,18,0,0"
+                Style="{StaticResource StatTitle}"
+                Text="What the driver reports" />
+
+              <ItemsControl Margin="0,6,0,0" ItemsSource="{Binding ViewModel.Properties, Mode=OneWay}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Grid Margin="0,3">
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="120" />
+                      </Grid.ColumnDefinitions>
+                      <TextBlock
+                        Grid.Column="0"
+                        Style="{StaticResource MonoText}"
+                        Text="{Binding Keyword, Mode=OneWay}" />
+                      <TextBlock
+                        Grid.Column="1"
+                        Style="{StaticResource MonoText}"
+                        Text="{Binding Value, Mode=OneWay}" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </ui:CardExpander>
+
+          <TextBlock
+            Style="{StaticResource StatCaption}"
+            Text="{Binding ViewModel.Status, Mode=OneWay}"
+            Visibility="{Binding ViewModel.Status, Converter={StaticResource EmptyToVisibility}, Mode=OneWay}" />
+        </StackPanel>
+      </ScrollViewer>
+    </Grid>
+  </Grid>
+</Page>

@@ -1,0 +1,147 @@
+<Page
+  x:Class="ProjectAgil.Views.Pages.ProfilesPage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:local="clr-namespace:ProjectAgil.Views.Pages"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+  Title="Saved setups"
+  d:DataContext="{d:DesignInstance local:ProfilesPage, IsDesignTimeCreatable=False}"
+  d:DesignHeight="760"
+  d:DesignWidth="1100"
+  ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
+  ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+  FocusVisualStyle="{x:Null}"
+  ToolTipService.InitialShowDelay="260"
+  ToolTipService.ShowDuration="60000"
+  ToolTipService.BetweenShowDelay="120"
+  mc:Ignorable="d">
+
+  <Grid Margin="36,18,36,22">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <StackPanel Grid.Row="0" Margin="0,0,0,14">
+      <TextBlock Style="{StaticResource PageTitle}" Text="Saved setups" />
+      <TextBlock Style="{StaticResource PageSubtitle}" Text="Store the settings you chose on the Optimize page under a name, so you can switch between them later or share them with a friend." />
+    </StackPanel>
+
+    <ui:Card
+      Grid.Row="1"
+      Margin="0,0,0,12"
+      Padding="18"
+      VerticalContentAlignment="Top">
+      <StackPanel>
+        <TextBlock Style="{StaticResource StatTitle}" Text="What you are using right now" />
+        <TextBlock
+          Margin="0,4,0,14"
+          FontSize="16"
+          FontWeight="SemiBold"
+          Text="{Binding ViewModel.ActiveSummary, Mode=OneWay}"
+          TextTrimming="CharacterEllipsis" />
+
+        <StackPanel Orientation="Horizontal">
+          <ui:TextBox
+            Width="260"
+            PlaceholderText="Give it a name"
+            Text="{Binding ViewModel.NewName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            ToolTip="For example: Hypixel, or Wi-Fi at my dads place." />
+          <ui:Button
+            Margin="8,0,0,0"
+            Appearance="Primary"
+            Command="{Binding ViewModel.SaveCurrentCommand, Mode=OneWay}"
+            Content="Save these settings"
+            Icon="{ui:SymbolIcon Save24}"
+            ToolTip="Stores what you currently have on the Optimize page under that name." />
+          <ui:Button
+            Margin="8,0,0,0"
+            Command="{Binding ViewModel.ImportCommand, Mode=OneWay}"
+            Content="Import"
+            Icon="{ui:SymbolIcon ArrowImport24}"
+            ToolTip="Load a setup someone sent you from a file." />
+          <ui:Button
+            Margin="8,0,0,0"
+            Command="{Binding ViewModel.ExportCommand, Mode=OneWay}"
+            Content="Export"
+            Icon="{ui:SymbolIcon Share24}"
+            ToolTip="Save what you are using right now to a file you can send to someone." />
+        </StackPanel>
+      </StackPanel>
+    </ui:Card>
+
+    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+      <StackPanel Margin="0,0,10,0">
+        <TextBlock
+          Style="{StaticResource StatCaption}"
+          Text="You have not saved any setups yet."
+          Visibility="{Binding ViewModel.Saved.Count, Converter={StaticResource CountToVisibility}, ConverterParameter=invert, Mode=OneWay}" />
+
+        <ItemsControl ItemsSource="{Binding ViewModel.Saved, Mode=OneWay}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <ui:Card Margin="0,0,0,8" Padding="16" VerticalContentAlignment="Top">
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                  </Grid.ColumnDefinitions>
+
+                  <StackPanel Grid.Column="0" Margin="0,0,16,0" VerticalAlignment="Center">
+                    <TextBlock
+                      FontSize="15"
+                      FontWeight="SemiBold"
+                      Text="{Binding Name, Mode=OneWay}" />
+                    <TextBlock
+                      Margin="0,4,0,0"
+                      Style="{StaticResource StatCaption}"
+                      Text="{Binding Summary, Mode=OneWay}" />
+                    <TextBlock
+                      Margin="0,3,0,0"
+                      Style="{StaticResource MonoText}"
+                      Text="{Binding SavedDisplay, Mode=OneWay}" />
+                  </StackPanel>
+
+                  <StackPanel
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+                    <ui:Button
+                      Margin="0,0,6,0"
+                      Appearance="Primary"
+                      Command="{Binding DataContext.ViewModel.LoadCommand, RelativeSource={RelativeSource AncestorType=Page}, Mode=OneWay}"
+                      CommandParameter="{Binding Mode=OneWay}"
+                      Content="Use this"
+                      ToolTip="Switch the Optimize page over to these settings. It does not apply anything on its own." />
+                    <ui:Button
+                      Margin="0,0,6,0"
+                      Command="{Binding DataContext.ViewModel.UpdateCommand, RelativeSource={RelativeSource AncestorType=Page}, Mode=OneWay}"
+                      CommandParameter="{Binding Mode=OneWay}"
+                      Icon="{ui:SymbolIcon SaveEdit24}"
+                      ToolTip="Overwrite this saved setup with whatever you have on the Optimize page right now. The name stays the same." />
+                    <ui:Button
+                      Margin="0,0,6,0"
+                      Command="{Binding DataContext.ViewModel.ExportCommand, RelativeSource={RelativeSource AncestorType=Page}, Mode=OneWay}"
+                      CommandParameter="{Binding Mode=OneWay}"
+                      Icon="{ui:SymbolIcon Share24}"
+                      ToolTip="Save this setup to a file." />
+                    <ui:Button
+                      Appearance="Danger"
+                      Command="{Binding DataContext.ViewModel.DeleteCommand, RelativeSource={RelativeSource AncestorType=Page}, Mode=OneWay}"
+                      CommandParameter="{Binding Mode=OneWay}"
+                      Icon="{ui:SymbolIcon Delete24}"
+                      ToolTip="Delete this saved setup." />
+                  </StackPanel>
+                </Grid>
+              </ui:Card>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</Page>

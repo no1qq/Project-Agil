@@ -1,0 +1,226 @@
+<Page
+  x:Class="ProjectAgil.Views.Pages.TweaksPage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:local="clr-namespace:ProjectAgil.Views.Pages"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+  Title="All settings"
+  d:DataContext="{d:DesignInstance local:TweaksPage, IsDesignTimeCreatable=False}"
+  d:DesignHeight="760"
+  d:DesignWidth="1100"
+  ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
+  ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+  FocusVisualStyle="{x:Null}"
+  ToolTipService.InitialShowDelay="260"
+  ToolTipService.ShowDuration="60000"
+  ToolTipService.BetweenShowDelay="120"
+  mc:Ignorable="d">
+
+  <Grid Margin="36,18,36,22">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <Grid Grid.Row="0" Margin="0,0,0,14">
+      <StackPanel Margin="0,0,220,0">
+        <TextBlock Style="{StaticResource PageTitle}" Text="All settings" />
+        <TextBlock Style="{StaticResource PageSubtitle}" Text="The full list of what Project-Agil can change, one by one. Click any row to see exactly which Windows setting it touches." />
+      </StackPanel>
+
+      <StackPanel
+        HorizontalAlignment="Right"
+        VerticalAlignment="Center"
+        Orientation="Horizontal">
+        <StackPanel Margin="0,0,14,0" VerticalAlignment="Center">
+          <TextBlock
+            HorizontalAlignment="Right"
+            Style="{StaticResource StatTitle}"
+            Text="Already set" />
+          <TextBlock
+            HorizontalAlignment="Right"
+            FontSize="16"
+            FontWeight="SemiBold">
+            <Run Text="{Binding ViewModel.OptimizedCount, Mode=OneWay}" />
+            <Run Text="/" />
+            <Run Text="{Binding ViewModel.TotalCount, Mode=OneWay}" />
+          </TextBlock>
+        </StackPanel>
+
+        <ui:Button
+          VerticalAlignment="Center"
+          Command="{Binding ViewModel.RefreshCommand, Mode=OneWay}"
+          Icon="{ui:SymbolIcon ArrowSync24}"
+          ToolTip="Read every setting from Windows again." />
+      </StackPanel>
+    </Grid>
+
+    <ui:Card
+      Grid.Row="1"
+      Margin="0,0,0,12"
+      Padding="14"
+      VerticalContentAlignment="Top">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="200" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <ui:TextBox
+          Grid.Column="0"
+          Margin="0,0,10,0"
+          Icon="{ui:SymbolIcon Search24}"
+          PlaceholderText="Search by name or by Windows setting"
+          Text="{Binding ViewModel.Search, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <ComboBox
+          Grid.Column="1"
+          Margin="0,0,14,0"
+          ItemsSource="{Binding ViewModel.Categories, Mode=OneWay}"
+          SelectedItem="{Binding ViewModel.SelectedCategory, Mode=TwoWay}"
+          ToolTip="Only show one group of settings." />
+
+        <ui:ToggleSwitch
+          Grid.Column="2"
+          VerticalAlignment="Center"
+          Content="Only what still needs changing"
+          IsChecked="{Binding ViewModel.OnlyPending, Mode=TwoWay}"
+          ToolTip="Hide everything that is already set the way Project-Agil wants it." />
+      </Grid>
+    </ui:Card>
+
+    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+      <ItemsControl Margin="0,0,10,0" ItemsSource="{Binding ViewModel.View, Mode=OneWay}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <ui:CardExpander Margin="0,0,0,8" IsExpanded="False">
+              <ui:CardExpander.Header>
+                <Grid Margin="0,0,10,0">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                  </Grid.ColumnDefinitions>
+
+                  <Ellipse
+                    Grid.Column="0"
+                    Width="8"
+                    Height="8"
+                    Margin="0,7,12,0"
+                    VerticalAlignment="Top"
+                    Fill="{Binding Status, Converter={StaticResource StatusToBrush}, Mode=OneWay}" />
+
+                  <StackPanel Grid.Column="1">
+                    <StackPanel Orientation="Horizontal">
+                      <TextBlock
+                        FontSize="14"
+                        FontWeight="SemiBold"
+                        Text="{Binding Name, Mode=OneWay}" />
+                      <Border Style="{StaticResource Pill}" Margin="10,1,0,0">
+                        <TextBlock Style="{StaticResource PillText}" Text="{Binding CategoryDisplay, Mode=OneWay}" />
+                      </Border>
+                      <Border Style="{StaticResource Pill}" Margin="6,1,0,0">
+                        <TextBlock Style="{StaticResource PillText}" Text="{Binding RiskDisplay, Mode=OneWay}" />
+                      </Border>
+                    </StackPanel>
+
+                    <TextBlock
+                      Margin="0,5,0,0"
+                      Style="{StaticResource StatCaption}"
+                      Text="{Binding Description, Mode=OneWay}" />
+                  </StackPanel>
+
+                  <TextBlock
+                    Grid.Column="2"
+                    Margin="14,4,0,0"
+                    VerticalAlignment="Top"
+                    FontSize="11.5"
+                    FontWeight="Medium"
+                    Foreground="{Binding Status, Converter={StaticResource StatusToBrush}, Mode=OneWay}"
+                    Text="{Binding Status, Converter={StaticResource StatusToText}, Mode=OneWay}" />
+                </Grid>
+              </ui:CardExpander.Header>
+
+              <StackPanel Margin="0,2,0,0">
+                <TextBlock
+                  Style="{StaticResource StatCaption}"
+                  Text="{Binding Impact, Mode=OneWay}"
+                  Visibility="{Binding Impact, Converter={StaticResource EmptyToVisibility}, Mode=OneWay}" />
+
+                <Border
+                  Style="{StaticResource HelpHost}"
+                  Margin="0,10,0,0"
+                  ToolTip="This is the exact Windows setting that gets written. Nothing else is touched.">
+                  <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                      <TextBlock Style="{StaticResource StatTitle}" Text="Windows setting changed" />
+                      <ui:SymbolIcon Style="{StaticResource HelpGlyph}" />
+                    </StackPanel>
+                    <TextBlock
+                      Margin="0,4,0,0"
+                      Style="{StaticResource MonoText}"
+                      Text="{Binding Target, Mode=OneWay}"
+                      TextTrimming="None"
+                      TextWrapping="Wrap" />
+                  </StackPanel>
+                </Border>
+
+                <Grid Margin="0,12,0,0">
+                  <StackPanel Orientation="Horizontal">
+                    <StackPanel Margin="0,0,28,0">
+                      <TextBlock Style="{StaticResource StatTitle}" Text="Set to now" />
+                      <TextBlock
+                        Margin="0,3,0,0"
+                        FontWeight="SemiBold"
+                        Text="{Binding CurrentDisplay, Mode=OneWay}" />
+                    </StackPanel>
+                    <StackPanel>
+                      <TextBlock Style="{StaticResource StatTitle}" Text="Project-Agil wants" />
+                      <TextBlock
+                        Margin="0,3,0,0"
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource AgilAccentBrush}"
+                        Text="{Binding Recommended, Mode=OneWay}" />
+                    </StackPanel>
+                  </StackPanel>
+
+                  <StackPanel
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+                    <ui:Button
+                      Margin="0,0,6,0"
+                      Command="{Binding DataContext.ViewModel.ApplyOneCommand, RelativeSource={RelativeSource AncestorType=Page}, Mode=OneWay}"
+                      CommandParameter="{Binding Mode=OneWay}"
+                      Content="Apply"
+                      Icon="{ui:SymbolIcon Checkmark24}"
+                      ToolTip="Change just this one setting now." />
+                    <ui:Button
+                      Margin="0,0,14,0"
+                      Command="{Binding DataContext.ViewModel.RevertOneCommand, RelativeSource={RelativeSource AncestorType=Page}, Mode=OneWay}"
+                      CommandParameter="{Binding Mode=OneWay}"
+                      Content="Undo"
+                      Icon="{ui:SymbolIcon ArrowUndo24}"
+                      ToolTip="Put this one setting back to the value it had before Project-Agil touched it." />
+                    <ui:ToggleSwitch
+                      VerticalAlignment="Center"
+                      Command="{Binding DataContext.ViewModel.ToggleExclusionCommand, RelativeSource={RelativeSource AncestorType=Page}, Mode=OneWay}"
+                      CommandParameter="{Binding Mode=OneWay}"
+                      Content="Skip"
+                      IsChecked="{Binding Excluded, Mode=OneWay}"
+                      ToolTip="Leave this setting alone when you run the optimizer." />
+                  </StackPanel>
+                </Grid>
+              </StackPanel>
+            </ui:CardExpander>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+  </Grid>
+</Page>

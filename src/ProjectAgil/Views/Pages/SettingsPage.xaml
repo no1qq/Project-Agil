@@ -1,0 +1,232 @@
+<Page
+  x:Class="ProjectAgil.Views.Pages.SettingsPage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:local="clr-namespace:ProjectAgil.Views.Pages"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+  Title="Settings"
+  d:DataContext="{d:DesignInstance local:SettingsPage, IsDesignTimeCreatable=False}"
+  d:DesignHeight="760"
+  d:DesignWidth="1100"
+  ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
+  ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+  FocusVisualStyle="{x:Null}"
+  ToolTipService.InitialShowDelay="260"
+  ToolTipService.ShowDuration="60000"
+  ToolTipService.BetweenShowDelay="120"
+  mc:Ignorable="d">
+
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel
+      MaxWidth="760"
+      Margin="36,18,36,28"
+      HorizontalAlignment="Left">
+
+      <StackPanel Margin="0,0,0,14">
+        <TextBlock Style="{StaticResource PageTitle}" Text="Settings" />
+        <TextBlock Style="{StaticResource PageSubtitle}" Text="How Project-Agil itself behaves. None of this changes your network." />
+      </StackPanel>
+
+      <ui:Card Margin="0,0,0,12" Padding="18" VerticalContentAlignment="Top">
+        <StackPanel>
+          <TextBlock Style="{StaticResource SectionHeader}" Text="Look and feel" />
+          <Grid>
+            <StackPanel Margin="0,0,60,0">
+              <TextBlock Style="{StaticResource SettingLabel}" Text="Dark theme" />
+              <TextBlock Style="{StaticResource StatCaption}" Text="Turn this off for the light theme." />
+            </StackPanel>
+            <ui:ToggleSwitch
+              HorizontalAlignment="Right"
+              VerticalAlignment="Center"
+              IsChecked="{Binding ViewModel.IsDark, Mode=TwoWay}" />
+          </Grid>
+        </StackPanel>
+      </ui:Card>
+
+      <ui:Card Margin="0,0,0,12" Padding="18" VerticalContentAlignment="Top">
+        <StackPanel>
+          <TextBlock Style="{StaticResource SectionHeader}" Text="Starting and closing" />
+
+          <Border Style="{StaticResource HelpHost}" Margin="0,0,0,14" ToolTip="Registered as a scheduled task that already runs as administrator, so Windows will not ask you for permission every time you log in.">
+            <Grid>
+              <StackPanel Margin="0,0,60,0">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Style="{StaticResource SettingLabel}" Text="Open when Windows starts" />
+                  <ui:SymbolIcon Style="{StaticResource HelpGlyph}" />
+                </StackPanel>
+                <TextBlock Style="{StaticResource StatCaption}" Text="No permission prompt at login." />
+              </StackPanel>
+              <ui:ToggleSwitch
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                IsChecked="{Binding ViewModel.StartWithWindows, Mode=TwoWay}" />
+            </Grid>
+          </Border>
+
+          <Grid Margin="0,0,0,14">
+            <StackPanel Margin="0,0,60,0">
+              <TextBlock Style="{StaticResource SettingLabel}" Text="Start hidden" />
+              <TextBlock Style="{StaticResource StatCaption}" Text="Opens straight into the icon next to the clock instead of showing the window." />
+            </StackPanel>
+            <ui:ToggleSwitch
+              HorizontalAlignment="Right"
+              VerticalAlignment="Center"
+              IsChecked="{Binding ViewModel.StartMinimized, Mode=TwoWay}" />
+          </Grid>
+
+          <Grid Margin="0,0,0,14">
+            <StackPanel Margin="0,0,60,0">
+              <TextBlock Style="{StaticResource SettingLabel}" Text="Minimising hides the window" />
+              <TextBlock Style="{StaticResource StatCaption}" Text="It goes to the icon next to the clock instead of the taskbar." />
+            </StackPanel>
+            <ui:ToggleSwitch
+              HorizontalAlignment="Right"
+              VerticalAlignment="Center"
+              IsChecked="{Binding ViewModel.MinimizeToTray, Mode=TwoWay}" />
+          </Grid>
+
+          <Grid>
+            <StackPanel Margin="0,0,60,0">
+              <TextBlock Style="{StaticResource SettingLabel}" Text="Closing hides the window" />
+              <TextBlock Style="{StaticResource StatCaption}" Text="Keeps Project-Agil running. Right click the icon next to the clock and pick Exit to really quit." />
+            </StackPanel>
+            <ui:ToggleSwitch
+              HorizontalAlignment="Right"
+              VerticalAlignment="Center"
+              IsChecked="{Binding ViewModel.CloseToTray, Mode=TwoWay}" />
+          </Grid>
+        </StackPanel>
+      </ui:Card>
+
+      <ui:Card Margin="0,0,0,12" Padding="18" VerticalContentAlignment="Top">
+        <StackPanel>
+          <TextBlock Style="{StaticResource SectionHeader}" Text="Before applying changes" />
+          <Grid>
+            <StackPanel Margin="0,0,60,0">
+              <TextBlock Style="{StaticResource SettingLabel}" Text="Ask me first" />
+              <TextBlock Style="{StaticResource StatCaption}" Text="Shows a summary of what is about to change before anything is written." />
+            </StackPanel>
+            <ui:ToggleSwitch
+              HorizontalAlignment="Right"
+              VerticalAlignment="Center"
+              IsChecked="{Binding ViewModel.ConfirmBeforeApply, Mode=TwoWay}" />
+          </Grid>
+        </StackPanel>
+      </ui:Card>
+
+      <ui:Card Margin="0,0,0,12" Padding="18" VerticalContentAlignment="Top">
+        <StackPanel>
+          <TextBlock Style="{StaticResource SectionHeader}" Text="Saved setups" />
+          <Grid>
+            <StackPanel Margin="0,0,60,0">
+              <TextBlock Style="{StaticResource SettingLabel}" Text="Keep my setup saved by itself" />
+              <TextBlock Style="{StaticResource StatCaption}" Text="Writes the setup you are using to disk once a minute, quietly and with no popup, so nothing is lost if the app or the machine goes down. The saved card with the same name is kept in step with it. Turn this off if you would rather press save yourself." />
+            </StackPanel>
+            <ui:ToggleSwitch
+              HorizontalAlignment="Right"
+              VerticalAlignment="Center"
+              IsChecked="{Binding ViewModel.AutoSaveProfile, Mode=TwoWay}" />
+          </Grid>
+        </StackPanel>
+      </ui:Card>
+
+      <ui:CardExpander Margin="0,0,0,12" IsExpanded="False">
+        <ui:CardExpander.Header>
+          <StackPanel>
+            <TextBlock Style="{StaticResource SettingLabel}" Text="Ping measurement" />
+            <TextBlock
+              Margin="0,3,0,0"
+              Style="{StaticResource StatCaption}"
+              Text="How often the ping graph takes a reading. The defaults are fine." />
+          </StackPanel>
+        </ui:CardExpander.Header>
+
+        <UniformGrid Margin="0,6,0,0" Columns="3">
+          <Border Style="{StaticResource HelpHost}" Margin="0,0,12,0" ToolTip="How long to wait between pings. Lower gives a smoother graph but sends more traffic.">
+            <StackPanel>
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Style="{StaticResource StatTitle}" Text="Gap between pings" />
+                <ui:SymbolIcon Style="{StaticResource HelpGlyph}" />
+              </StackPanel>
+              <ui:NumberBox
+                Margin="0,6,0,0"
+                ClearButtonEnabled="False"
+                Maximum="5000"
+                Minimum="100"
+                SmallChange="50"
+                Value="{Binding ViewModel.PingInterval, Mode=TwoWay}" />
+              <TextBlock Margin="0,4,0,0" Style="{StaticResource StatCaption}" Text="milliseconds" />
+            </StackPanel>
+          </Border>
+
+          <Border Style="{StaticResource HelpHost}" Margin="0,0,12,0" ToolTip="How long to wait for a reply before counting the packet as lost.">
+            <StackPanel>
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Style="{StaticResource StatTitle}" Text="Give up after" />
+                <ui:SymbolIcon Style="{StaticResource HelpGlyph}" />
+              </StackPanel>
+              <ui:NumberBox
+                Margin="0,6,0,0"
+                ClearButtonEnabled="False"
+                Maximum="8000"
+                Minimum="200"
+                SmallChange="100"
+                Value="{Binding ViewModel.PingTimeout, Mode=TwoWay}" />
+              <TextBlock Margin="0,4,0,0" Style="{StaticResource StatCaption}" Text="milliseconds" />
+            </StackPanel>
+          </Border>
+
+          <Border Style="{StaticResource HelpHost}" ToolTip="How many readings the graph keeps before the oldest ones drop off the left edge.">
+            <StackPanel>
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Style="{StaticResource StatTitle}" Text="Points on the graph" />
+                <ui:SymbolIcon Style="{StaticResource HelpGlyph}" />
+              </StackPanel>
+              <ui:NumberBox
+                Margin="0,6,0,0"
+                ClearButtonEnabled="False"
+                Maximum="2000"
+                Minimum="60"
+                SmallChange="30"
+                Value="{Binding ViewModel.HistorySize, Mode=TwoWay}" />
+              <TextBlock Margin="0,4,0,0" Style="{StaticResource StatCaption}" Text="readings" />
+            </StackPanel>
+          </Border>
+        </UniformGrid>
+      </ui:CardExpander>
+
+      <ui:Card Padding="18" VerticalContentAlignment="Top">
+        <StackPanel>
+          <TextBlock Style="{StaticResource SectionHeader}" Text="About Project-Agil" />
+          <TextBlock FontWeight="Medium" Text="{Binding ViewModel.Version, Mode=OneWay}" />
+          <TextBlock
+            Margin="0,6,0,0"
+            Style="{StaticResource StatCaption}"
+            Text="Free, and everything happens on this computer. No account, no licence key, nothing is ever sent anywhere. Every change is written to an undo point first and can be put back from the Undo points page." />
+          <TextBlock
+            Margin="0,10,0,0"
+            Style="{StaticResource MonoText}"
+            Text="{Binding ViewModel.DataFolder, Mode=OneWay}" />
+
+          <StackPanel Margin="0,14,0,0" Orientation="Horizontal">
+            <ui:Button
+              Margin="0,0,8,0"
+              Command="{Binding ViewModel.OpenDataFolderCommand, Mode=OneWay}"
+              Content="Open my data folder"
+              Icon="{ui:SymbolIcon FolderOpen24}"
+              ToolTip="Everything Project-Agil stores lives here." />
+            <ui:Button
+              Appearance="Danger"
+              Command="{Binding ViewModel.ResetDataCommand, Mode=OneWay}"
+              Content="Delete my data"
+              Icon="{ui:SymbolIcon Delete24}"
+              ToolTip="Removes your saved setups, undo points and settings. Anything already applied to Windows stays applied, and you will no longer be able to undo it." />
+          </StackPanel>
+        </StackPanel>
+      </ui:Card>
+    </StackPanel>
+  </ScrollViewer>
+</Page>

@@ -1,0 +1,436 @@
+<Page
+  x:Class="ProjectAgil.Views.Pages.OptimizePage"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:local="clr-namespace:ProjectAgil.Views.Pages"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+  Title="Optimize"
+  d:DataContext="{d:DesignInstance local:OptimizePage, IsDesignTimeCreatable=False}"
+  d:DesignHeight="760"
+  d:DesignWidth="1100"
+  ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
+  ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+  FocusVisualStyle="{x:Null}"
+  ToolTipService.InitialShowDelay="260"
+  ToolTipService.ShowDuration="60000"
+  ToolTipService.BetweenShowDelay="120"
+  mc:Ignorable="d">
+
+  <Grid Margin="36,18,36,22">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <StackPanel Grid.Row="0" Margin="0,0,0,14">
+      <TextBlock Style="{StaticResource PageTitle}" Text="Optimize" />
+      <TextBlock Style="{StaticResource PageSubtitle}" Text="Pick a preset, check what it is about to change on the right, then apply it. Nothing is written until you press the button." />
+    </StackPanel>
+
+    <Grid Grid.Row="1">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="420" />
+        <ColumnDefinition Width="16" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <Grid Grid.Column="0">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollViewer
+          Grid.Row="0"
+          Padding="0,0,10,0"
+          VerticalScrollBarVisibility="Auto">
+          <StackPanel>
+
+            <ui:Card Margin="0,0,0,12" Padding="18" VerticalContentAlignment="Top">
+              <StackPanel>
+                <TextBlock Style="{StaticResource SectionHeader}" Text="1. Pick a preset" />
+
+                <UniformGrid Columns="2">
+                  <ui:Button
+                    Margin="0,0,5,6"
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding ViewModel.ApplyPresetCommand, Mode=OneWay}"
+                    CommandParameter="safe"
+                    Content="Safe"
+                    ToolTip="Only the changes that cannot go wrong. A small improvement, no risk, nothing that needs a restart." />
+                  <ui:Button
+                    Margin="5,0,0,6"
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding ViewModel.ApplyPresetCommand, Mode=OneWay}"
+                    CommandParameter="balanced"
+                    Content="Balanced"
+                    ToolTip="The sensible middle. Good ping improvement without touching anything unusual. Start here if you are not sure." />
+                  <ui:Button
+                    Margin="0,0,5,0"
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding ViewModel.ApplyPresetCommand, Mode=OneWay}"
+                    CommandParameter="pvp"
+                    Content="PvP"
+                    ToolTip="The strongest setting. Strips out every bit of buffering Windows adds, so hits register as fast as possible. Some changes need a restart." />
+                  <ui:Button
+                    Margin="5,0,0,0"
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding ViewModel.ApplyPresetCommand, Mode=OneWay}"
+                    CommandParameter="unstable"
+                    Content="Shaky link"
+                    ToolTip="For Wi-Fi or a connection that drops packets. Keeps the safety nets that help a bad line instead of stripping them out." />
+                </UniformGrid>
+              </StackPanel>
+            </ui:Card>
+
+            <ui:Card Margin="0,0,0,12" Padding="18" VerticalContentAlignment="Top">
+              <StackPanel>
+                <TextBlock Style="{StaticResource SectionHeader}" Text="2. Adjust it if you want" />
+
+                <Border
+                  Style="{StaticResource HelpHost}"
+                  Margin="0,0,0,16"
+                  ToolTip="Windows normally waits a moment and bundles small packets together to save bandwidth. In a game that wait is pure delay. Turning this on sends every packet the instant it is ready.">
+                  <Grid>
+                    <StackPanel Margin="0,0,60,0">
+                      <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource SettingLabel}" Text="Send packets immediately" />
+                        <ui:SymbolIcon Style="{StaticResource HelpGlyph}" />
+                      </StackPanel>
+                      <TextBlock
+                        Margin="0,3,0,0"
+                        Style="{StaticResource StatCaption}"
+                        Text="Stops Windows from holding your hits back for a few milliseconds" />
+                    </StackPanel>
+                    <ui:ToggleSwitch
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Center"
+                      IsChecked="{Binding ViewModel.SmartPackets, Mode=TwoWay}" />
+                  </Grid>
+                </Border>
+
+                <Border
+                  Style="{StaticResource HelpHost}"
+                  Margin="0,0,0,16"
+                  ToolTip="Slide right to remove more of the waiting Windows builds into the network stack: packet bundling first, then acknowledgement delays, then retry timers. Higher means less delay but less tolerance for a bad line.">
+                  <StackPanel>
+                    <Grid>
+                      <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource SettingLabel}" Text="Cut waiting time" />
+                        <ui:SymbolIcon Style="{StaticResource HelpGlyph}" />
+                      </StackPanel>
+                      <TextBlock
+                        HorizontalAlignment="Right"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource AgilAccentBrush}"
+                        Text="{Binding ViewModel.Latency, Mode=OneWay}" />
+                    </Grid>
+                    <Slider
+                      Margin="0,6,0,4"
+                      IsSnapToTickEnabled="True"
+                      Maximum="100"
+                      Minimum="0"
+                      TickFrequency="1"
+                      Value="{Binding ViewModel.Latency, Mode=TwoWay}" />
+                    <TextBlock Style="{StaticResource StatCaption}" Text="Higher means Windows waits less before sending and resending" />
+                  </StackPanel>
+                </Border>
+
+                <Border
+                  Style="{StaticResource HelpHost}"
+                  ToolTip="Slide right to hand more processor time and network bandwidth to the game instead of Windows background work like updates and file sharing.">
+                  <StackPanel>
+                    <Grid>
+                      <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource SettingLabel}" Text="Prioritise the game" />
+                        <ui:SymbolIcon Style="{StaticResource HelpGlyph}" />
+                      </StackPanel>
+                      <TextBlock
+                        HorizontalAlignment="Right"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource AgilAccentBrush}"
+                        Text="{Binding ViewModel.Responsiveness, Mode=OneWay}" />
+                    </Grid>
+                    <Slider
+                      Margin="0,6,0,4"
+                      IsSnapToTickEnabled="True"
+                      Maximum="100"
+                      Minimum="0"
+                      TickFrequency="1"
+                      Value="{Binding ViewModel.Responsiveness, Mode=TwoWay}" />
+                    <TextBlock Style="{StaticResource StatCaption}" Text="Higher means background Windows tasks get out of the way" />
+                  </StackPanel>
+                </Border>
+              </StackPanel>
+            </ui:Card>
+
+            <ui:CardExpander Margin="0,0,0,12" IsExpanded="False">
+              <ui:CardExpander.Header>
+                <StackPanel>
+                  <TextBlock Style="{StaticResource SettingLabel}" Text="Advanced options" />
+                  <TextBlock
+                    Margin="0,3,0,0"
+                    Style="{StaticResource StatCaption}"
+                    Text="You can leave all of this alone. The presets already set it for you." />
+                </StackPanel>
+              </ui:CardExpander.Header>
+
+              <StackPanel Margin="0,4,0,0">
+                <Border
+                  Style="{StaticResource HelpHost}"
+                  Margin="0,0,0,14"
+                  ToolTip="The network card to tune. Pick the one you actually play on if you have both cable and Wi-Fi plugged in.">
+                  <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                      <TextBlock Style="{StaticResource StatTitle}" Text="Network card" />
+                      <ui:SymbolIcon Style="{StaticResource HelpGlyph}" />
+                    </StackPanel>
+                    <ComboBox
+                      Margin="0,6,0,0"
+                      HorizontalAlignment="Stretch"
+                      DisplayMemberPath="Summary"
+                      ItemsSource="{Binding ViewModel.Adapters, Mode=OneWay}"
+                      SelectedItem="{Binding ViewModel.SelectedAdapter, Mode=TwoWay}" />
+                  </StackPanel>
+                </Border>
+
+                <Grid Margin="0,0,0,14">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="*" />
+                  </Grid.ColumnDefinitions>
+
+                  <Border
+                    Grid.Column="0"
+                    Style="{StaticResource HelpHost}"
+                    ToolTip="How much Windows is allowed to grow the receive buffer. Smaller buffers mean less delay but slower big downloads. Restricted is the usual choice for gaming.">
+                    <StackPanel>
+                      <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource StatTitle}" Text="Receive buffer" />
+                        <ui:SymbolIcon Style="{StaticResource HelpGlyph}" />
+                      </StackPanel>
+                      <ComboBox
+                        Margin="0,6,0,0"
+                        HorizontalAlignment="Stretch"
+                        DisplayMemberPath="Label"
+                        ItemsSource="{Binding ViewModel.TuningOptions, Mode=OneWay}"
+                        SelectedItem="{Binding ViewModel.SelectedTuning, Mode=TwoWay}" />
+                    </StackPanel>
+                  </Border>
+
+                  <Border
+                    Grid.Column="2"
+                    Style="{StaticResource HelpHost}"
+                    ToolTip="What kind of internet you have. This decides the packet size and a few timing values that differ between fiber, cable, DSL and mobile.">
+                    <StackPanel>
+                      <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource StatTitle}" Text="Internet type" />
+                        <ui:SymbolIcon Style="{StaticResource HelpGlyph}" />
+                      </StackPanel>
+                      <ComboBox
+                        Margin="0,6,0,0"
+                        HorizontalAlignment="Stretch"
+                        DisplayMemberPath="Label"
+                        ItemsSource="{Binding ViewModel.ConnectionOptions, Mode=OneWay}"
+                        SelectedItem="{Binding ViewModel.SelectedConnection, Mode=TwoWay}" />
+                    </StackPanel>
+                  </Border>
+                </Grid>
+
+                <Border
+                  Style="{StaticResource HelpHost}"
+                  Margin="0,0,0,14"
+                  ToolTip="Turn this off if your connection drops packets, for example on Wi-Fi. Project-Agil then keeps the recovery settings that help a bad line instead of removing them.">
+                  <Grid>
+                    <StackPanel Margin="0,0,60,0">
+                      <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource SettingLabel}" Text="My connection is stable" />
+                        <ui:SymbolIcon Style="{StaticResource HelpGlyph}" />
+                      </StackPanel>
+                      <TextBlock
+                        Margin="0,3,0,0"
+                        Style="{StaticResource StatCaption}"
+                        Text="Off keeps the safety nets that help a dropping connection" />
+                    </StackPanel>
+                    <ui:ToggleSwitch
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Center"
+                      IsChecked="{Binding ViewModel.StableConnection, Mode=TwoWay}" />
+                  </Grid>
+                </Border>
+
+                <Border
+                  Style="{StaticResource HelpHost}"
+                  ToolTip="Adds driver level changes such as buffer sizes and interrupt timing. These depend on your exact network card, so they help on some machines and do nothing on others.">
+                  <Grid>
+                    <StackPanel Margin="0,0,60,0">
+                      <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource SettingLabel}" Text="Include driver tweaks" />
+                        <ui:SymbolIcon Style="{StaticResource HelpGlyph}" />
+                      </StackPanel>
+                      <TextBlock
+                        Margin="0,3,0,0"
+                        Style="{StaticResource StatCaption}"
+                        Text="Depends on your hardware, so results vary" />
+                    </StackPanel>
+                    <ui:ToggleSwitch
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Center"
+                      IsChecked="{Binding ViewModel.IncludeAdvanced, Mode=TwoWay}" />
+                  </Grid>
+                </Border>
+              </StackPanel>
+            </ui:CardExpander>
+          </StackPanel>
+        </ScrollViewer>
+
+        <ui:Card
+          Grid.Row="1"
+          Margin="0,12,10,0"
+          Padding="18"
+          VerticalContentAlignment="Top">
+          <StackPanel>
+            <ui:Button
+              Height="44"
+              HorizontalAlignment="Stretch"
+              Appearance="Primary"
+              Command="{Binding ViewModel.RunCommand, Mode=OneWay}"
+              Content="Apply these changes"
+              FontSize="15"
+              Icon="{ui:SymbolIcon Flash24}"
+              IsEnabled="{Binding ViewModel.IsRunning, Converter={StaticResource InverseBool}, Mode=OneWay}"
+              ToolTip="Writes the settings listed on the right. The old values are saved to an undo point first." />
+
+            <ProgressBar
+              Height="4"
+              Margin="0,12,0,0"
+              Foreground="{DynamicResource AgilAccentBrush}"
+              Maximum="100"
+              Value="{Binding ViewModel.Progress, Mode=OneWay}"
+              Visibility="{Binding ViewModel.IsRunning, Converter={StaticResource BoolToVisibility}, Mode=OneWay}" />
+
+            <TextBlock
+              Margin="0,8,0,0"
+              Style="{StaticResource StatCaption}"
+              Text="{Binding ViewModel.ProgressText, Mode=OneWay}"
+              Visibility="{Binding ViewModel.ProgressText, Converter={StaticResource EmptyToVisibility}, Mode=OneWay}" />
+
+            <ui:InfoBar
+              Margin="0,12,0,0"
+              IsClosable="True"
+              IsOpen="{Binding ViewModel.RestartRequired, Mode=OneWay}"
+              Message="A few of the settings only kick in after you restart Windows."
+              Severity="Informational"
+              Title="Restart when you can" />
+          </StackPanel>
+        </ui:Card>
+      </Grid>
+
+      <Grid Grid.Column="2">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <ui:Card
+          Grid.Row="0"
+          Margin="0,0,0,12"
+          Padding="18"
+          VerticalContentAlignment="Top">
+          <Grid>
+            <StackPanel Margin="0,0,110,0">
+              <TextBlock Style="{StaticResource SectionHeader}" Text="What this will change" />
+              <TextBlock FontSize="18" FontWeight="SemiBold">
+                <Run Text="{Binding ViewModel.PendingCount, Mode=OneWay}" />
+                <Run Text="settings still need changing" />
+              </TextBlock>
+              <TextBlock Margin="0,4,0,0" Style="{StaticResource StatCaption}">
+                <Run Text="Out of" />
+                <Run Text="{Binding ViewModel.PlanCount, Mode=OneWay}" />
+                <Run Text="in this plan." />
+                <Run Text="{Binding ViewModel.RestartCount, Mode=OneWay}" />
+                <Run Text="of them need a Windows restart to take effect." />
+              </TextBlock>
+            </StackPanel>
+            <ui:Button
+              HorizontalAlignment="Right"
+              VerticalAlignment="Top"
+              Command="{Binding ViewModel.RefreshCommand, Mode=OneWay}"
+              Content="Re-check"
+              Icon="{ui:SymbolIcon ArrowSync24}"
+              ToolTip="Read every setting from Windows again and rebuild this list." />
+          </Grid>
+        </ui:Card>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+          <ItemsControl ItemsSource="{Binding ViewModel.PlanGroups, Mode=OneWay}" Margin="0,0,10,0">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <ui:CardExpander Margin="0,0,0,8" IsExpanded="False">
+                  <ui:CardExpander.Header>
+                    <TextBlock FontWeight="SemiBold" Text="{Binding Header, Mode=OneWay}" />
+                  </ui:CardExpander.Header>
+                  <ItemsControl ItemsSource="{Binding Items, Mode=OneWay}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <Border
+                          Style="{StaticResource HelpHost}"
+                          Margin="0,4,0,10"
+                          ToolTip="{Binding Reason, Mode=OneWay}">
+                          <Grid>
+                            <Grid.ColumnDefinitions>
+                              <ColumnDefinition Width="8" />
+                              <ColumnDefinition Width="*" />
+                              <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Ellipse
+                              Grid.Column="0"
+                              Width="7"
+                              Height="7"
+                              Margin="0,6,0,0"
+                              VerticalAlignment="Top"
+                              Fill="{Binding Status, Converter={StaticResource StatusToBrush}, Mode=OneWay}" />
+
+                            <StackPanel Grid.Column="1" Margin="12,0,12,0">
+                              <TextBlock
+                                FontSize="13"
+                                FontWeight="Medium"
+                                Text="{Binding Name, Mode=OneWay}" />
+                              <TextBlock
+                                Margin="0,3,0,0"
+                                Style="{StaticResource StatCaption}"
+                                Text="{Binding Description, Mode=OneWay}" />
+                              <TextBlock Margin="0,4,0,0" Style="{StaticResource MonoText}">
+                                <Run Text="{Binding CurrentDisplay, Mode=OneWay}" />
+                                <Run Foreground="{DynamicResource AgilAccentBrush}" Text="  to  " />
+                                <Run Text="{Binding DesiredValue, Mode=OneWay}" />
+                              </TextBlock>
+                            </StackPanel>
+
+                            <TextBlock
+                              Grid.Column="2"
+                              VerticalAlignment="Top"
+                              FontSize="11"
+                              Foreground="{Binding Status, Converter={StaticResource StatusToBrush}, Mode=OneWay}"
+                              Text="{Binding Status, Converter={StaticResource StatusToText}, Mode=OneWay}" />
+                          </Grid>
+                        </Border>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </ui:CardExpander>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Grid>
+    </Grid>
+  </Grid>
+</Page>
